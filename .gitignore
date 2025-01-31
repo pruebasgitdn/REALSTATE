@@ -1,0 +1,21 @@
+# Ignorar dependencias
+node_modules/
+server/node_modules/
+frontend/node_modules/
+
+# Archivos de entorno
+.env
+server/.env
+frontend/.env
+
+# Archivos de compilación de React
+frontend/build/
+
+# Archivos de caché y logs
+*.log
+server/logs/
+frontend/logs/
+
+# Archivos del editor y sistema
+.vscode/
+.DS_Store

@@ -1,0 +1,150 @@
+.titlelist {
+  text-align: center;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.imgdetail {
+  width: 70vw;
+  height: 60vh;
+  border-radius: 10px;
+  margin: 0 auto;
+  object-fit: fill;
+}
+
+#no_user {
+  text-align: center;
+  color: rgb(238, 7, 7);
+  font-weight: 500;
+  padding: 25px;
+}
+
+.divlistings {
+  background-color: rgb(18, 15, 73);
+  /* background-color: brown; */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+#iconolistdt {
+  display: flex;
+  flex-direction: row;
+  font-size: 18px;
+  /* align-items: center; */
+  gap: 8px;
+}
+
+.div_calendar_details {
+  padding: 5px;
+  background-color: rgb(207, 205, 205);
+  display: flex;
+  flex-direction: column;
+  /* gap: 5px; */
+  border-radius: 10px;
+
+  h2 {
+    color: black;
+    font-size: 18px;
+    text-align: start;
+  }
+  p {
+    color: black;
+    font-size: 18px;
+    text-align: start;
+    font-style: normal;
+  }
+}
+
+/* #calendarpanel {
+  width: 80%;
+  margin: 0 auto;
+} */
+
+#icnlist_red {
+  color: red;
+  &:hover {
+    color: rgb(161, 8, 8);
+  }
+}
+
+#icnlist_green {
+  color: rgb(5, 162, 71);
+  &:hover {
+    color: rgb(0, 255, 64);
+  }
+}
+
+.amenities {
+  margin: 0 auto;
+}
+#card_item {
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  h2 {
+    color: black;
+  }
+
+  h3 {
+    color: black;
+  }
+}
+
+.quantity_list {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  color: black;
+  font-weight: 800;
+}
+
+.header_list {
+  display: flex;
+  justify-content: space-around;
+}
+
+.amenities {
+}
+.desc {
+  display: flex;
+  flex-direction: column;
+
+  p {
+    text-align: start;
+    color: black;
+  }
+}
+
+.save_btn {
+  display: inline-flex;
+  align-items: center;
+  font-size: 18px;
+  /* justify-content: space-between; */
+  gap: 4px;
+
+  &:hover {
+    cursor: pointer;
+    color: red;
+  }
+}
+
+/* Pantallas anchas (monitores grandes) */
+@media (min-width: 1200px) {
+  /* Ajustes finales para monitores grandes */
+}
+
+/* Laptops y desktops */
+@media (min-width: 1024px) {
+  /* Cambios para pantallas más grandes */
+}
+
+@media (min-width: 768px) {
+  /* Cambios para tablets */
+}
+
+/* Opcional: para móviles más pequeños */
+@media (max-width: 480px) {
+}

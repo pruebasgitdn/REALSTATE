@@ -1,0 +1,37 @@
+.editprocard {
+  margin: 0 auto;
+  width: 90%;
+}
+
+.container_tplist {
+  background-color: rgb(228, 227, 227);
+  width: 100%;
+  min-height: 100vh;
+  padding-right: 15px;
+  padding-left: 15px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  padding-bottom: 15px;
+  h2 {
+    text-align: center;
+    color: rgb(0, 5, 61);
+    font-weight: 400;
+  }
+}
+
+@media (min-width: 1200px) {
+  /* Ajustes finales para monitores grandes */
+}
+
+/* Laptops y desktops */
+@media (min-width: 1024px) {
+  /* Cambios para pantallas más grandes */
+}
+
+@media (min-width: 768px) {
+  /* Cambios para tablets */
+}
+
+/* Opcional: para móviles más pequeños */
+@media (max-width: 480px) {
+}

@@ -1,0 +1,192 @@
+h2 {
+  color: rgb(255, 0, 179);
+  margin: 15px auto;
+}
+
+h3 {
+  color: rgb(55, 1, 155);
+}
+
+hr {
+  /* width: 90%; */
+  border: 1px thin rgb(124, 113, 113);
+  border-radius: 20px;
+  margin: 10px auto;
+}
+
+.inputnumber {
+  width: 100%;
+}
+
+#createbutton {
+  color: white;
+  background-color: rgb(0, 223, 100);
+  &:hover {
+    background-color: green;
+  }
+}
+
+.inpform {
+  width: 90%;
+  margin: 0 auto;
+}
+
+.inpbadge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.iconcard {
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgb(111, 111, 111);
+  border-radius: 8px;
+  font-size: small;
+  align-items: center;
+  text-align: center;
+  margin: 0 auto;
+  flex-direction: column;
+
+  &:hover {
+    color: rgb(6, 174, 225);
+    border: 2px dashed rgb(13, 107, 221);
+    h4 {
+      color: white;
+    }
+    cursor: pointer;
+  }
+}
+
+.centero {
+  width: auto;
+  display: flex;
+  justify-content: center;
+}
+h4 {
+  color: rgb(91, 89, 89);
+  font-style: italic;
+  margin: 10px;
+}
+
+.naziz {
+  background-color: rgb(237, 237, 232);
+  margin-top: 10px;
+
+  p {
+    color: rgb(0, 0, 0);
+    text-align: justify;
+    font-style: normal;
+  }
+
+  h3 {
+    color: rgb(0, 0, 0);
+    font-style: normal;
+    text-align: justify;
+  }
+
+  &:hover {
+    color: rgb(6, 174, 225);
+    border: 2px dashed rgb(13, 107, 221);
+
+    p,
+    h3 {
+      color: rgb(13, 107, 221);
+    }
+  }
+  cursor: pointer;
+}
+
+.publy {
+  text-align: center;
+  color: rgb(0, 5, 61);
+  font-weight: 400;
+}
+
+.selected {
+  background-color: rgb(227, 239, 236);
+  border: 2px solid rgb(4, 135, 171);
+  color: rgb(4, 135, 171);
+}
+
+.infoplace {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
+.badge {
+  margin: 20px;
+}
+
+.dragger_create {
+  width: 100%;
+}
+
+.place {
+  background-color: rgb(219, 234, 230);
+  color: rgb(4, 135, 171);
+  margin: 5px;
+  border-radius: 6px;
+  border: 2px solid rgb(6, 174, 225);
+
+  p {
+    color: rgb(4, 135, 171);
+  }
+  h3 {
+    box-shadow: none;
+    color: rgb(4, 135, 171);
+  }
+}
+
+#card {
+  margin: 0 auto;
+  width: 90%;
+}
+
+.center {
+  margin: 0 auto;
+}
+
+/* @media (min-width: 1024px) {
+  #card {
+    width: 990px;
+  }
+}
+
+@media (max-width: 768px) {
+  #card {
+    width: 650px;
+  }
+}
+
+@media (max-width: 533px) {
+  #card {
+    width: 500px;
+  }
+} */
+
+/* Pantallas anchas (monitores grandes) */
+@media (min-width: 1200px) {
+  /* Ajustes finales para monitores grandes */
+}
+
+/* Laptops y desktops */
+@media (min-width: 1024px) {
+  /* Cambios para pantallas más grandes */
+}
+
+@media (min-width: 768px) {
+  /* Cambios para tablets */
+  #card {
+    width: 80%;
+  }
+}
+
+/* Opcional: para móviles más pequeños */
+@media (max-width: 480px) {
+  #card {
+    width: 80%;
+  }
+}

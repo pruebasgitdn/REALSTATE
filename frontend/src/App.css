@@ -1,0 +1,299 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  font-family: "DM Sans", sans-serif;
+}
+
+#passwordinp {
+  text-align: center;
+}
+
+#passwordinp::placeholder {
+  color: white;
+  text-align: center;
+}
+
+.containerimg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 5px;
+  gap: 10px;
+}
+
+#imgpreview {
+  width: 120px;
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 50px;
+  height: 150px;
+}
+
+.dragger {
+  width: 70%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-bottom: 0;
+  padding: 10px;
+}
+#passworerror {
+  color: red;
+  font-size: small;
+  font-style: italic;
+}
+
+#bbt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.select_pplist {
+  width: 15%;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+#uploadbtn {
+  width: 100%;
+  height: 40px;
+}
+#registerbtn {
+  width: 70%;
+}
+
+.form-item {
+  width: 100%;
+}
+
+.form-input {
+  border-bottom: #22c55e 3px solid;
+  text-align: center;
+  color: white;
+}
+
+.form-input::placeholder {
+  color: white;
+}
+
+.form-upload-btn {
+  background-color: white;
+  color: rgb(28, 129, 6);
+}
+.green-btn {
+  background-color: rgb(7, 201, 7);
+  color: white;
+
+  &:hover {
+    background-color: rgb(5, 118, 18);
+  }
+}
+
+.avatarfill {
+  object-fit: contain;
+}
+a {
+  text-decoration: none;
+  color: white;
+  margin-top: 10px;
+  text-align: center;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.alert-success {
+  position: fixed;
+  top: 1rem; /* Similar a top-4 en Tailwind */
+  background-color: #22c55e;
+  color: white; /* Texto blanco (text-white en Tailwind) */
+  padding: 0.5rem 1rem; /* Padding (px-4 py-2 en Tailwind) */
+  border-radius: 0.5rem;
+  z-index: 50;
+}
+
+.alert-error {
+  position: fixed;
+  top: 1rem; /* Similar a top-4 en Tailwind */
+  background-color: #b71414;
+  color: white; /* Texto blanco (text-white en Tailwind) */
+  padding: 0.5rem 1rem; /* Padding (px-4 py-2 en Tailwind) */
+  border-radius: 0.5rem;
+  z-index: 50;
+}
+
+.login {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: url("../../frontend/public/assets/medallo.jpg") center;
+  background-size: cover;
+}
+
+.content {
+  display: flex;
+  text-align: center;
+  flex-direction: column;
+  /* gap: 10px; */
+  width: 40%;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 20px;
+}
+
+#searchbar {
+  min-width: 250px;
+}
+
+.nazo {
+  width: 100%;
+  background-color: #14b783;
+}
+.naza {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 8px 0;
+}
+
+.nav_flex {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+
+  align-items: center;
+}
+.listings {
+  height: 65vh;
+}
+.nav_user {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+
+  h4 {
+    color: black;
+    font-style: normal;
+  }
+}
+
+.upp:hover {
+  background-color: rgba(60, 255, 0, 0.662);
+  width: 65%;
+  border-radius: 10px;
+}
+
+.register {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: url("../../frontend/public/assets/ss.jpg") center;
+  background-size: cover;
+}
+#logo {
+  width: 150px;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-input:focus {
+  outline: none;
+  border-bottom: 2px solid green;
+}
+.custom-input {
+  background-color: rgba(0, 0, 0, 0.05);
+  width: 70%;
+  color: white;
+  font-size: small;
+  border: none;
+  text-align: center;
+  border-bottom: 1px solid white;
+  border-radius: 0;
+  padding: 8px;
+
+  &:focus {
+    outline: none;
+    border-bottom: 2px solid green;
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.custom-input:focus {
+  outline: none;
+  border-bottom: 2px solid green;
+}
+
+@media (min-width: 1024px) {
+  #card {
+    width: 990px;
+  }
+  #searchbar {
+    width: 50vw;
+  }
+  .naza {
+    /* width: 60vw; */
+
+    display: flex;
+    justify-content: space-around;
+  }
+}
+
+/* Pantallas pequeñas (móviles) */
+@media (max-width: 768px) {
+  #searchbar {
+    min-width: 40px;
+  }
+}
+
+@media (max-width: 533px) {
+  #logo {
+    width: 100px;
+  }
+  #searchbar {
+    width: 20vw;
+  }
+
+  .nav_flex {
+    margin: 0 auto;
+  }
+
+  .nav_user {
+    margin: 0 auto;
+  }
+
+  .naza {
+    width: 100%;
+  }
+
+  .listings {
+    height: 100%;
+    width: 100vw;
+    padding: 15px 0;
+  }
+}
