@@ -7,7 +7,6 @@ frontend/node_modules/
 .env
 server/config.env
 
-
 # Archivos de compilación de React
 frontend/build/
 
@@ -15,6 +14,9 @@ frontend/build/
 *.log
 server/logs/
 frontend/logs/
+server/tmp
+
+tmp/
 
 # Archivos del editor y sistema
 .vscode/
