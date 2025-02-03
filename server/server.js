@@ -8,7 +8,12 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const PORT = process.env.PORT || 4000;
 //conectar app en el puerto 4000
-app.listen(process.env.PORT, () => {
-  console.log(`Servidor escuchando en puerto: ${process.env.PORT}`);
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en puerto: ${PORT}`);
+});
+
+app.get("/", (req, res) => {
+  res.send("Backend funcionando correctamente 🚀");
 });

@@ -5,8 +5,8 @@ frontend/node_modules/
 
 # Archivos de entorno
 .env
-server/.env
-frontend/.env
+server/config.env
+
 
 # Archivos de compilación de React
 frontend/build/
