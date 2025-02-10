@@ -14,8 +14,8 @@ config({ path: "./config.env" });
 
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URI], //dominios que tienen acceso al API
-    methods: ["PUT", "DELETE", "POST", "GET"], //metodos http
+    origin: ["https://realstate-1.onrender.com", "http://localhost:3000"],
+    methods: ["PUT", "DELETE", "POST", "GET"],
     credentials: true,
   })
 );
