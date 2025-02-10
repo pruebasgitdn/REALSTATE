@@ -39,8 +39,8 @@ const Listings = () => {
       setLoading(true);
       const response = await axios.get(
         category !== "todo"
-          ? ` http://localhost:4000/api/listing/propertys/${category}`
-          : `http://localhost:4000/api/listing/propertys`,
+          ? ` https://realstate-g3bo.onrender.com/api/listing/propertys/${category}`
+          : `https://realstate-g3bo.onrender.com/api/listing/propertys`,
 
         {
           withCredentials: true,

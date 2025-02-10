@@ -28,7 +28,9 @@ const WishList = () => {
         // Resolver todas las promesas de la lista de deseos
         const responses = await Promise.all(
           user.listaDeseos.map((id) =>
-            axios.get(`http://localhost:4000/api/listing/property_id/${id}`)
+            axios.get(
+              `https://realstate-g3bo.onrender.com/api/listing/property_id/${id}`
+            )
           )
         );
         const listingsData = responses.map((res) => res.data.listings); // Extraer las publicaciones
@@ -51,7 +53,7 @@ const WishList = () => {
 
     try {
       const response = await axios.put(
-        "http://localhost:4000/api/user/whishlist_add",
+        "https://realstate-g3bo.onrender.com/api/user/whishlist_add",
         { listingId: id },
         {
           withCredentials: true,

@@ -19,7 +19,7 @@ const TripList = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        "http://localhost:4000/api/booking/triplist",
+        "https://realstate-g3bo.onrender.com/api/booking/triplist",
         {
           withCredentials: true,
         }

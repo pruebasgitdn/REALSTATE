@@ -44,7 +44,7 @@ const TripListCard = ({
       setLoadingBtn(true);
 
       const response = await axios.put(
-        "http://localhost:4000/api/user/whishlist_add",
+        "https://realstate-g3bo.onrender.com/api/user/whishlist_add",
         { listingId: id },
         {
           withCredentials: true,

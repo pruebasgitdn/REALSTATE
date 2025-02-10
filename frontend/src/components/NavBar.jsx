@@ -106,7 +106,7 @@ const NavBar = () => {
   const handleLogout = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:4000/api/user/logout",
+        "https://realstate-g3bo.onrender.com/api/user/logout",
         {
           withCredentials: true, // Importante para incluir cookies
         }

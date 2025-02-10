@@ -74,7 +74,7 @@ const RegisterPage = () => {
     try {
       setIsDeleting(true);
       const response = await axios.post(
-        "http://localhost:4000/api/user/register",
+        "https://realstate-g3bo.onrender.com/api/user/register",
         formDataToSend,
         {
           withCredentials: true,

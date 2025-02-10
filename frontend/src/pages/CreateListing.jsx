@@ -182,7 +182,7 @@ const CreateListing = () => {
       });
 
       const response = await axios.post(
-        "http://localhost:4000/api/listing/createlisting",
+        "https://realstate-g3bo.onrender.com/api/listing/createlisting",
         formData,
 
         {

@@ -64,7 +64,7 @@ const ListingDetails = () => {
       formData.append("precioTotal", precioTotal);
 
       const response = await axios.post(
-        "http://localhost:4000/api/booking/createbooking",
+        "https://realstate-g3bo.onrender.com/api/booking/createbooking",
         formData,
         {
           withCredentials: true,
@@ -97,7 +97,7 @@ const ListingDetails = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:4000/api/listing/property_id/${id}`,
+        `https://realstate-g3bo.onrender.com/api/listing/property_id/${id}`,
         {
           withCredentials: true,
         }

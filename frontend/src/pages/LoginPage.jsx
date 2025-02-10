@@ -22,7 +22,7 @@ const LoginPage = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/user/login",
+        "https://realstate-g3bo.onrender.com/api/user/login",
         formDataToSend,
         {
           withCredentials: true,

@@ -25,7 +25,7 @@ const PropertyCard = ({
       const newStatus = estado === "habilitado" ? "inhabilitado" : "habilitado";
 
       const response = await axios.put(
-        `http://localhost:4000/api/listing/property_setstatus/${id}`,
+        `https://realstate-g3bo.onrender.com/api/listing/property_setstatus/${id}`,
         {
           estado: newStatus,
         },

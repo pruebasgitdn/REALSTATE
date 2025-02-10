@@ -13,7 +13,7 @@ const ReservationList = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        "http://localhost:4000/api/listing/my_reservations",
+        "https://realstate-g3bo.onrender.com/api/listing/my_reservations",
         {
           withCredentials: true,
         }

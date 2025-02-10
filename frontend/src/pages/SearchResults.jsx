@@ -29,7 +29,7 @@ const SearchResults = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/listing/search",
+          "https://realstate-g3bo.onrender.com/api/listing/search",
           {
             params: { titulo, categoria },
           }

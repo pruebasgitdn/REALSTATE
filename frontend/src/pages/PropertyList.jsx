@@ -17,7 +17,7 @@ const PropertyList = () => {
       setLoading(true);
 
       const response = await axios.get(
-        "http://localhost:4000/api/listing/mylistings",
+        "https://realstate-g3bo.onrender.com/api/listing/mylistings",
         {
           withCredentials: true,
         }

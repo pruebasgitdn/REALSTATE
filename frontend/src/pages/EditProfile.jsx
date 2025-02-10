@@ -33,7 +33,7 @@ const EditProfile = () => {
       setLoadingBtn(true);
 
       const response = await axios.put(
-        "http://localhost:4000/api/user/edit_profile",
+        "https://realstate-g3bo.onrender.com/api/user/edit_profile",
         formDataToSend,
         {
           withCredentials: true,
