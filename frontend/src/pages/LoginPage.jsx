@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "../App.css";
 import axios from "axios";
-import { setLogin } from "../redux/state";
+import { setLogin } from "../redux/userState.js";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Button, Form, Col, Input, message } from "antd";
+import { syncFavosUser } from "../lib/functions.js";
+import { syncUserFavo } from "../redux/favoState.js";
 
 const LoginPage = () => {
   const [form] = Form.useForm();
@@ -12,7 +14,7 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
 
-  const user = useSelector((state) => state?.user?.user);
+  const user = useSelector((state) => state?.persistedReducer?.user?.user);
 
   const handleLogin = async (values) => {
     console.log(values);
@@ -22,7 +24,7 @@ const LoginPage = () => {
 
     try {
       const response = await axios.post(
-        "https://realstate-g3bo.onrender.com/api/user/login",
+        "http://localhost:4000/api/user/login",
         formDataToSend,
         {
           withCredentials: true,
@@ -31,8 +33,6 @@ const LoginPage = () => {
       if (response.status === 200) {
         setLoading(true);
         message.success("Login exitoso!");
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        localStorage.setItem("token", JSON.stringify(response.data.token));
 
         dispatch(
           setLogin({
@@ -40,6 +40,12 @@ const LoginPage = () => {
             token: response.data.token,
           })
         );
+
+        //Sincronizar con bd
+        const xzz = await syncFavosUser();
+        if (xzz.status === 200) {
+          dispatch(syncUserFavo(xzz.data.response));
+        }
 
         await navigate("/");
       }
@@ -112,9 +118,9 @@ const LoginPage = () => {
           </Col>
 
           <br />
-          <div className="center">
+          <div className="cont_btn_isession">
             <Button
-              className="green-btn"
+              className="btn_isession"
               size="small"
               type="outlined"
               htmlType="submit"
@@ -123,7 +129,6 @@ const LoginPage = () => {
             >
               Ingresar
             </Button>
-
             <a href="/register">No tiene cuenta? Registrarse.</a>
           </div>
         </Form>

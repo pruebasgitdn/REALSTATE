@@ -18,7 +18,7 @@ import { MdOutlineCabin } from "react-icons/md";
 import axios from "axios";
 import { AiOutlineGlobal } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import { setListings } from "../redux/state";
+import { setListings } from "../redux/userState.js";
 import ListingCard from "./ListingCard.jsx";
 
 const Listings = () => {
@@ -27,7 +27,8 @@ const Listings = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const listings = useSelector((state) => state.user.listings) || []; //estdo global
+  const listings =
+    useSelector((state) => state.persistedReducer.user?.listings) || []; //estdo global
 
   const onChangeCategory = async () => {
     console.log(category);
@@ -39,8 +40,8 @@ const Listings = () => {
       setLoading(true);
       const response = await axios.get(
         category !== "todo"
-          ? ` https://realstate-g3bo.onrender.com/api/listing/propertys/${category}`
-          : `https://realstate-g3bo.onrender.com/api/listing/propertys`,
+          ? ` http://localhost:4000/api/listing/propertys/${category}`
+          : `http://localhost:4000/api/listing/propertys`,
 
         {
           withCredentials: true,
@@ -275,31 +276,25 @@ const Listings = () => {
         <div className="ctlist">
           <br />
 
-          <Row gutter={[16, 16]} justify="center">
+          <Row gutter={[16, 16]} justify="center" className="container_bvmas">
             {listings.slice(0, 3).map((nn) => (
-              <Col
-                key={nn._id}
-                xs={24}
-                sm={12}
-                md={8}
-                onClick={() => {
-                  navigate(`/property_id/${nn._id}`);
-                }}
-              >
+              <Col key={nn._id} xs={24} sm={12} md={8}>
                 <ListingCard
+                  id={nn._id}
                   nombrecreador={nn.creador.nombre}
                   apellidocreador={nn.creador.apellido}
                   categoria={nn.categoria}
                   tipo={nn.tipo}
                   titulo={nn.titulo}
                   fotos={nn.fotos}
+                  tipoPublicacion={nn.tipoPublicacion}
                 />
               </Col>
             ))}
           </Row>
           <br />
 
-          <div className="center">
+          <div className="container_bvmas">
             <Button
               className="btn_vmas"
               size="medium"
@@ -310,6 +305,7 @@ const Listings = () => {
               Ver todas.
             </Button>
           </div>
+
           <br />
         </div>
       ) : (

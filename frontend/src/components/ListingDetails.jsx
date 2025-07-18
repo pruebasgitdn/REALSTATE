@@ -16,14 +16,18 @@ import {
 import "../styles/ListingDetails.css";
 import { useNavigate } from "react-router-dom";
 import { amenitiesIcons, type_Place, amenities } from "../constants";
-
+import dayjs from "dayjs";
 import { FaHeartCircleCheck, FaHeartCirclePlus } from "react-icons/fa6";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { handleAddFavo, handleRemoveFavo } from "../lib/functions.js";
+import { addToFavo, removeFromFavo } from "../redux/favoState.js";
+import { PaymentButton } from "./PaymentButton.jsx";
 
 const ListingDetails = () => {
   const { id } = useParams(); // id del path donde las rutas de la app estan App.js
 
+  const dispatch = useDispatch();
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -31,25 +35,64 @@ const ListingDetails = () => {
   const [listing, setListings] = useState(null);
   const [selectedDates, setSelectedDates] = useState([]);
   const [precioTotal, setPrecioTotal] = useState(0);
-
+  const [btnDisabled, setBtnDisabled] = useState(false);
   const { RangePicker } = DatePicker;
 
+  const user = useSelector((state) => state?.persistedReducer?.user);
+
+  const favoState = useSelector((state) => state?.persistedReducer?.favorites);
+  const fullFavoItems = favoState.favorites;
+  const [isFavorite, setIsFavorite] = useState(false);
+
   const handleDateChange = (dates) => {
-    if (dates) {
-      setSelectedDates(dates);
-
-      const totalDias = dates[1].diff(dates[0], "days"); // Diferencia en dias
-      const totalx = totalDias * (listing?.precio || 0);
-      setPrecioTotal(totalx);
-    } else {
+    if (!dates || dates.length !== 2) {
       setSelectedDates([]);
+      setPrecioTotal(0);
+      return;
     }
+
+    const [start, end] = dates;
+    setSelectedDates(dates);
+
+    if (!listing) return;
+
+    const precio = listing.precio;
+    const unidad = (listing.unidadPrecio || "").trim().toLowerCase();
+
+    let total = 0;
+
+    if (unidad === "día") {
+      const dias = end.diff(start, "days");
+      if (dias <= 0) {
+        message.warning("La fecha de fin debe ser posterior a la de inicio.");
+        setPrecioTotal(0);
+        return;
+      }
+      total = precio * dias;
+    } else if (unidad === "mes") {
+      const dias = end.diff(start, "days");
+
+      if (dias < 28) {
+        message.warning("Debes seleccionar al menos 1 mes completo (28 días).");
+        setBtnDisabled(true);
+        setPrecioTotal(0);
+        return;
+      }
+
+      const meses = end.diff(start, "month", true);
+      const mesesRedondeados = Math.ceil(meses);
+
+      console.log("Meses calculados:", meses);
+      console.log("Meses redondeados:", mesesRedondeados);
+      console.log(start.toString() + " ---- " + end.toString());
+
+      total = precio * mesesRedondeados;
+    } else if (unidad === "fijo") {
+      total = precio;
+    }
+    setBtnDisabled(false);
+    setPrecioTotal(total);
   };
-
-  const user = useSelector((state) => state.user);
-  const zz = useSelector((state) => state?.user?.user);
-
-  const [isFavorite, setIsFavorite] = useState(zz?.listaDeseos.includes(id));
 
   const onFinish = async () => {
     try {
@@ -64,7 +107,7 @@ const ListingDetails = () => {
       formData.append("precioTotal", precioTotal);
 
       const response = await axios.post(
-        "https://realstate-g3bo.onrender.com/api/booking/createbooking",
+        "http://localhost:4000/api/booking/createbooking",
         formData,
         {
           withCredentials: true,
@@ -79,7 +122,7 @@ const ListingDetails = () => {
       //   console.log(`${key}: ${value}`);
       // });
     } catch (error) {
-      if (error.response.status === 409) {
+      if (error.response.status === 400) {
         message.error(error.response.data?.message);
       } else {
         const errorMessage =
@@ -97,13 +140,12 @@ const ListingDetails = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://realstate-g3bo.onrender.com/api/listing/property_id/${id}`,
+        `http://localhost:4000/api/listing/property_id/${id}`,
         {
           withCredentials: true,
         }
       );
       setListings(response.data.listings);
-      console.log(response.data.listings);
     } catch (error) {
       console.log(error);
     } finally {
@@ -113,11 +155,16 @@ const ListingDetails = () => {
 
   useEffect(() => {
     fetchList();
-    console.log(user);
-    console.log(zz);
-    setIsFavorite(zz?.listaDeseos.includes(id));
-  }, [zz?.listaDeseos, id]);
+  }, [id]);
 
+  useEffect(() => {
+    if (listing && fullFavoItems.length > 0) {
+      const isFavo = fullFavoItems.some(
+        (item) => item.publicacionId === listing._id
+      );
+      setIsFavorite(isFavo);
+    }
+  }, [fullFavoItems, listing]);
   return (
     <>
       {loading ? (
@@ -133,11 +180,41 @@ const ListingDetails = () => {
                 <div className="save_btn">
                   {isFavorite ? (
                     <>
-                      <FaHeartCircleCheck id="icnlist_green" size={30} />
+                      <FaHeartCircleCheck
+                        id="icnlist_green"
+                        title="Eliminar de favoritos"
+                        size={30}
+                        onClick={async () => {
+                          dispatch(removeFromFavo(listing._id));
+                          await handleRemoveFavo({
+                            listingID: listing._id,
+                            clientID: user.user._id,
+                          });
+                          message.info("Se removió de favoritos");
+                        }}
+                      />
                     </>
                   ) : (
                     <>
-                      <FaHeartCirclePlus id="icnlist_red" size={30} />
+                      <FaHeartCirclePlus
+                        id="icnlist_red"
+                        size={30}
+                        title="Añadir a favoritos"
+                        onClick={async () => {
+                          dispatch(
+                            addToFavo({
+                              publicacionId: listing._id,
+                              clienteId: user.user._id,
+                            })
+                          );
+
+                          await handleAddFavo({
+                            listingID: listing._id,
+                            clientID: user.user._id,
+                          });
+                          message.success("Se añadió a favoritos");
+                        }}
+                      />
                     </>
                   )}
                 </div>
@@ -179,7 +256,9 @@ const ListingDetails = () => {
                   <div className="quantity_list">
                     Creado por: {listing.creador.nombre}{" "}
                     {listing.creador.apellido}{" "}
-                    <Avatar src={listing.creador.photo.url} size={30} />
+                    {listing.creador?.photo?.url !== null ? (
+                      <Avatar src={listing.creador?.photo?.url} size={30} />
+                    ) : null}
                   </div>
                   <hr />
                   <div className="desc">
@@ -223,48 +302,61 @@ const ListingDetails = () => {
                           <p>No hay comodidades disponibles para mostrar.</p>
                         )}
                       </Col>
-
                       <Col xs={24} sm={24} md={12}>
-                        <Form form={form} onFinish={onFinish} layout="vertical">
+                        {listing.tipoPublicacion === "alquiler" ? (
                           <div className="div_calendar_details">
-                            <RangePicker
-                              disabled={!user || !user.user}
-                              onChange={handleDateChange}
-                              required
-                            />
-                            <h2>Precio total: ${precioTotal}</h2>
-                            <p>
-                              Fecha de inicio:{" "}
-                              {selectedDates[0]
-                                ? selectedDates[0].format("YYYY-MM-DD")
-                                : "No seleccionada"}
-                            </p>
-                            <p>
-                              Fecha de fin:{" "}
-                              {selectedDates[1]
-                                ? selectedDates[1].format("YYYY-MM-DD")
-                                : "No seleccionada"}
-                            </p>
-                            <Button
-                              loading={loadingForm}
-                              className="green-btn"
-                              size="small"
-                              type="outlined"
-                              htmlType="submit"
-                              block
-                              disabled={!user || !user.user}
+                            <Form
+                              form={form}
+                              onFinish={onFinish}
+                              layout="vertical"
                             >
-                              AGENDAR
-                            </Button>
-                            {user && user.user ? (
-                              <></>
-                            ) : (
-                              <p id="no_user">
-                                Inicie sesión para poder agendar esta propiedad.
+                              <RangePicker
+                                disabled={!user || !user.user}
+                                onChange={handleDateChange}
+                                required
+                                className="jaja"
+                              />
+                              <h2>Precio total: ${precioTotal}</h2>
+                              <p>Para alquiler por: {listing.unidadPrecio}</p>
+                              <p>
+                                Fecha de inicio:{" "}
+                                {selectedDates[0]
+                                  ? selectedDates[0].format("YYYY-MM-DD")
+                                  : "No seleccionada"}
                               </p>
-                            )}
+                              <p>
+                                Fecha de fin:{" "}
+                                {selectedDates[1]
+                                  ? selectedDates[1].format("YYYY-MM-DD")
+                                  : "No seleccionada"}
+                              </p>
+                              <Button
+                                loading={loadingForm}
+                                className="green-btn"
+                                size="small"
+                                type="outlined"
+                                htmlType="submit"
+                                block
+                                disabled={
+                                  !user || !user.user || btnDisabled === true
+                                }
+                              >
+                                AGENDAR
+                              </Button>
+                              {!user?.user && (
+                                <p id="no_user">
+                                  Inicie sesión para poder agendar esta
+                                  propiedad.
+                                </p>
+                              )}
+                            </Form>
                           </div>
-                        </Form>
+                        ) : (
+                          <div id="venta_div">
+                            <h3>Publicación para venta</h3>
+                            <PaymentButton listing={listing} />
+                          </div>
+                        )}
                       </Col>
                     </Row>
                   </div>

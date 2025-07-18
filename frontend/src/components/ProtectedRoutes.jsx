@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 const ProtectedRoutes = ({ children }) => {
   const navigate = useNavigate();
-  const token = useSelector((state) => state?.user?.token);
+  const token = useSelector((state) => state?.persistedReducer?.user?.token);
 
   useEffect(() => {
     if (!token) {

@@ -1,13 +1,14 @@
 .tripcardlist {
-  padding: 10px;
   margin: 0px;
   height: 100%;
-  &:hover {
-    cursor: pointer;
-    border: 2px solid rgb(212, 208, 208);
-  }
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.405);
 }
 
+.container_favs {
+  background-color: rgb(228, 227, 227);
+  width: 100%;
+  min-height: 100vh;
+}
 .trlstimg {
   width: 100%;
   height: 180px;
@@ -26,6 +27,42 @@
   font-style: normal;
 }
 
+#th_w {
+  text-transform: uppercase;
+  color: black;
+  font-weight: 500;
+  font-style: normal;
+}
+#nini {
+  padding: 5px;
+  border-radius: 20px;
+  background-color: green;
+  color: white;
+  width: min-content;
+  border-color: green;
+  font-size: small;
+  text-transform: uppercase;
+  font-weight: 300;
+  font-style: normal;
+  &:hover {
+    cursor: pointer;
+    opacity: 75%;
+  }
+}
+.calvo {
+  display: flex;
+}
+.plac {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  h4 {
+    font-style: normal;
+    font-size: smaller;
+    color: black;
+  }
+}
 .subp_trip {
   color: black;
   font-weight: 400;
@@ -36,6 +73,22 @@
   flex-direction: column;
 }
 
+.goet {
+  display: flex;
+  /* align-items: center; */
+  justify-content: space-between;
+  flex-wrap: wrap;
+  h4 {
+    font-style: normal;
+    color: black;
+    font-weight: 300;
+  }
+}
+
+.carralhoo {
+  display: flex;
+  align-items: center;
+}
 #icntrip {
   color: black;
   font-size: 20px;
@@ -65,7 +118,15 @@
   font-weight: 500;
   font-style: normal;
 }
-
+.space_btwn {
+  display: flex;
+  color: gray;
+  justify-content: space-around;
+  p {
+    font-size: small;
+    color: rgb(65, 64, 64);
+  }
+}
 .pricediv {
   display: inline-flex;
   flex-direction: row;

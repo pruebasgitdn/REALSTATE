@@ -6,6 +6,7 @@ import { FaCircleArrowDown } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { categoryIcons } from "../constants.js";
 import "../styles/ResultCard.css";
+import { formatPrice } from "../lib/functions.js";
 const SearchCardResult = ({
   creadorNombre,
   creadorApellido,
@@ -29,7 +30,7 @@ const SearchCardResult = ({
             <Carousel infinite={false} arrows className="werma">
               {fotos.map((foto, index) => (
                 <div key={index}>
-                  <img src={foto.url} alt={`Foto`} className="imgcarou" />
+                  <img src={foto?.url} alt={`Foto`} className="imgcarou" />
                 </div>
               ))}
             </Carousel>
@@ -44,23 +45,28 @@ const SearchCardResult = ({
             <br />
             <p>{descripcion}</p>
           </div>
-          <div className="categorydiv">
-            <h4>{type_Place[tipo]}</h4>
-            <h4>{category[categoria]}</h4>
-            {categoryIcons[categoria] && (
-              <span id="icntrip">{categoryIcons[categoria]}</span>
-            )}{" "}
+
+          <div className="plac">
+            <div>
+              <h4>{type_Place[tipo]}</h4>
+            </div>
+            <div className="calvo">
+              <h4>{category[categoria]}</h4>
+              {categoryIcons[categoria] && (
+                <span id="icntrip">{categoryIcons[categoria]}</span>
+              )}
+            </div>
           </div>
           <hr />
-          <div className="categorydiv">
-            <h4>
-              Creador: {creadorNombre} {creadorApellido}{" "}
+          <div className="vent">
+            <h4 className="">
+              Creador: {creadorNombre} {creadorApellido}
             </h4>
-            <Avatar className="avatarfill" src={creadorFoto.url} size={30} />
+            <Avatar className="avatarfill" src={creadorFoto?.url} size={30} />
           </div>
           <hr />
           <div className="infocardsearch">
-            <h3>$ {precio} COP</h3>
+            <h3>{formatPrice(precio)}</h3>
           </div>
           <Button
             className="green-btn"

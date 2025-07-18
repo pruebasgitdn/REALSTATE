@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../App.css";
 import { HiCloudArrowUp } from "react-icons/hi2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Button, Upload, Row, message, Form, Input, Col, Avatar } from "antd";
+import { Button, Upload, message, Form, Input, Col, Avatar } from "antd";
 import { AiFillDelete } from "react-icons/ai";
 
 const RegisterPage = () => {
@@ -74,7 +74,7 @@ const RegisterPage = () => {
     try {
       setIsDeleting(true);
       const response = await axios.post(
-        "https://realstate-g3bo.onrender.com/api/user/register",
+        "http://localhost:4000/api/user/register",
         formDataToSend,
         {
           withCredentials: true,
@@ -93,8 +93,9 @@ const RegisterPage = () => {
       setIsDeleting(false);
     } catch (error) {
       setIsDeleting(true);
-      if (error.response || error.response.data) {
-        setErrorMessage(error.response.data.message);
+      if (error.response || error) {
+        setErrorMessage(error.response.message);
+        console.log(error);
       }
 
       setErrorAlert(true);
@@ -190,7 +191,7 @@ const RegisterPage = () => {
                   message: "Ingresa contraseña",
                 },
                 {
-                  max: 15,
+                  max: 8,
                   message: "¡La contraseña debe tener maximo 8 digitos!",
                 },
               ]}
@@ -249,10 +250,11 @@ const RegisterPage = () => {
             {!passwordMatch && (
               <p id="passworerror">Las contraseñas deben coindicidir</p>
             )}
-
+          </div>
+          <div className="l01">
             <Button
               size="small"
-              className="green-btn"
+              className="btn_isession"
               type="outlined"
               htmlType="submit"
               disabled={!passwordMatch}

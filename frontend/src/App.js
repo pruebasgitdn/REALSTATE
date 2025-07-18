@@ -4,7 +4,7 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { useDispatch } from "react-redux";
-import { setLogin } from "./redux/state";
+import { setLogin } from "./redux/userState.js";
 import { useEffect } from "react";
 import NavBar from "./components/NavBar";
 import CreateListing from "./pages/CreateListing";
@@ -16,18 +16,21 @@ import EditProfile from "./pages/EditProfile";
 import PropertyList from "./pages/PropertyList";
 import ReservationList from "./pages/ReservationList";
 import SearchResults from "./pages/SearchResults";
+import MySales from "./components/MySales.jsx";
+import Success from "./components/Success.jsx";
+import Cancel from "./components/Cancel.jsx";
 //nazi
 function App() {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = localStorage.getItem("token");
+  // useEffect(() => {
+  //   const user = JSON.parse(localStorage.getItem("user"));
+  //   const token = localStorage.getItem("token");
 
-    if (user && token) {
-      dispatch(setLogin({ user: user, token: token }));
-    }
-  }, [dispatch]);
+  //   if (user && token) {
+  //     dispatch(setLogin({ user: user, token: token }));
+  //   }
+  // }, [dispatch]);
 
   return (
     <>
@@ -92,6 +95,30 @@ function App() {
               </ProtectedRoutes>
             }
             path="/wish_list"
+          />
+          <Route
+            element={
+              <ProtectedRoutes>
+                <MySales />
+              </ProtectedRoutes>
+            }
+            path="/my_sales"
+          />
+          <Route
+            element={
+              <ProtectedRoutes>
+                <Success />
+              </ProtectedRoutes>
+            }
+            path="/success"
+          />
+          <Route
+            element={
+              <ProtectedRoutes>
+                <Cancel />
+              </ProtectedRoutes>
+            }
+            path="/cancel"
           />
         </Routes>
       </Router>

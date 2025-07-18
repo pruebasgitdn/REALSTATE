@@ -1,8 +1,25 @@
 .editprocard {
   margin: 0 auto;
-  width: 90%;
+  width: 50%;
 }
 
+.btn_upload {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn_nb {
+  border: dashed rgb(18, 117, 188) 1px;
+  width: 140px;
+  height: 100px;
+  color: rgb(18, 117, 188);
+}
+.ppp {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
 .container_tplist {
   background-color: rgb(228, 227, 227);
   width: 100%;
@@ -19,19 +36,30 @@
   }
 }
 
-@media (min-width: 1200px) {
+@media (max-width: 1200px) {
   /* Ajustes finales para monitores grandes */
+  .editprocard {
+  }
 }
 
 /* Laptops y desktops */
-@media (min-width: 1024px) {
+@media (max-width: 1024px) {
   /* Cambios para pantallas más grandes */
+  .editprocard {
+    width: 70%;
+  }
 }
 
-@media (min-width: 768px) {
+@media (max-width: 768px) {
   /* Cambios para tablets */
+  .editprocard {
+    width: 80%;
+  }
 }
 
 /* Opcional: para móviles más pequeños */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
+  .editprocard {
+    width: 90%;
+  }
 }

@@ -18,10 +18,6 @@ const ListingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    aptoSuite: {
-      type: String,
-      required: true,
-    },
     municipio: {
       type: String,
       required: true,
@@ -82,6 +78,16 @@ const ListingSchema = new mongoose.Schema(
     },
     precio: {
       type: Number,
+      required: true,
+    },
+    unidadPrecio: {
+      type: String,
+      enum: ["fijo", "mes", "día"],
+      required: true,
+    },
+    tipoPublicacion: {
+      type: String,
+      enum: ["venta", "alquiler"],
       required: true,
     },
     estado: {

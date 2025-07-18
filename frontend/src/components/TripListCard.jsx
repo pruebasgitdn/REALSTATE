@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Carousel, message, Avatar } from "antd";
+import { Card, Button, Carousel, message } from "antd";
 import "../styles/TripListCard.css";
 import { category, categoryIcons } from "../constants";
 import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
-import { updateUser } from "../redux/state.js";
 import { useNavigate } from "react-router-dom";
-
 import { FaHeartCircleCheck, FaHeartCirclePlus } from "react-icons/fa6";
+import {
+  formatPrice,
+  handleAddFavo,
+  handleRemoveFavo,
+} from "../lib/functions.js";
+import { addToFavo, removeFromFavo } from "../redux/favoState.js";
 
 const TripListCard = ({
   id,
@@ -27,44 +30,23 @@ const TripListCard = ({
   anfitrionFoto,
 }) => {
   const navigate = useNavigate();
-  const userstate = useSelector((state) => state?.user?.user) || null;
-  const [loadingBtn, setLoadingBtn] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(
-    userstate?.listaDeseos?.includes(id)
-  ); // Establece el estado local
-
   const dispatch = useDispatch();
+  const userstate =
+    useSelector((state) => state?.persistedReducer?.user?.user) || null;
+
+  const favoState = useSelector((state) => state?.persistedReducer?.favorites);
+  const fullFavoItems = favoState.favorites;
+  console.log(userstate._id);
+  console.log(id);
+
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    setIsFavorite(userstate?.listaDeseos?.includes(id));
-  }, []);
-
-  const handleFavo = async () => {
-    try {
-      setLoadingBtn(true);
-
-      const response = await axios.put(
-        "https://realstate-g3bo.onrender.com/api/user/whishlist_add",
-        { listingId: id },
-        {
-          withCredentials: true,
-        }
-      );
-
-      if (response.status === 200) {
-        const updatedWishList = response.data.wishList;
-        console.log(response.data.wishList);
-        dispatch(updateUser({ listaDeseos: updatedWishList }));
-        setIsFavorite(!isFavorite);
-
-        message.info(response.data.message);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoadingBtn(false);
+    if (fullFavoItems.length > 0) {
+      const isFavo = fullFavoItems.some((item) => item.publicacionId === id);
+      setIsFavorite(isFavo);
     }
-  };
+  }, [fullFavoItems, id]);
 
   return (
     <>
@@ -73,7 +55,7 @@ const TripListCard = ({
           <Carousel infinite={false} arrows className="werma">
             {fotos.map((foto, index) => (
               <div key={index}>
-                <img src={foto.url} alt={`Foto`} className="trlstimg" />
+                <img src={foto?.url} alt={`Foto`} className="trlstimg" />
               </div>
             ))}
           </Carousel>
@@ -86,42 +68,66 @@ const TripListCard = ({
           <h3 id="placetrip">
             {municipio} en {departamento} - {pais}
           </h3>
-          <div className="categorydiv">
-            <h4>{category[categoria]}</h4>
-            {categoryIcons[categoria] && (
-              <span id="icntrip">{categoryIcons[categoria]}</span>
-            )}{" "}
-            <hr />
-          </div>
-
-          <div className="categorydiv">
-            <h4>
-              Anfitrion : {anfitrionNombre} {anfitrionApellido} {}
-            </h4>
-            <Avatar src={anfitrionFoto.url} size={30} />
-          </div>
-
-          <h4 id="fechapt">
-            {fechaInicio} - {fechaFin}
-          </h4>
-          <div className="pricediv">
-            <h4 id="preciopt">$ {precioTotal} Total</h4>
-            <Button
-              type="text"
-              size="small"
-              onClick={handleFavo}
-              loading={loadingBtn}
-            >
-              {isFavorite ? (
-                <>
-                  <FaHeartCircleCheck id="icnlist_green" size={22} />
-                </>
-              ) : (
-                <>
-                  <FaHeartCirclePlus id="icnlist_red" size={22} />
-                </>
+          <div className="goet">
+            <div className="carralhoo">
+              <h4>{category[categoria]}</h4>
+              {categoryIcons[categoria] && (
+                <span id="icntrip">{categoryIcons[categoria]}</span>
               )}
-            </Button>
+            </div>
+            <div>
+              <h4>
+                Propietario: {anfitrionNombre} {anfitrionApellido}
+              </h4>
+            </div>
+          </div>
+
+          <div className="space_btwn">
+            <p>{fechaInicio}</p>-<p>{fechaFin}</p>
+          </div>
+          <div className="pricediv">
+            <h4 id="preciopt">{formatPrice(precioTotal)}</h4>
+
+            {isFavorite ? (
+              <>
+                <FaHeartCircleCheck
+                  id="icnlist_green"
+                  title="Eliminar de favoritos"
+                  size={22}
+                  onClick={async () => {
+                    dispatch(removeFromFavo(id));
+                    await handleRemoveFavo({
+                      listingID: id,
+                      clientID: userstate?._id,
+                    });
+                    setIsFavorite(false);
+                    message.info("Se removió de favoritos");
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                <FaHeartCirclePlus
+                  id="icnlist_red"
+                  title="Añadir a favoritos"
+                  size={22}
+                  onClick={async () => {
+                    dispatch(
+                      addToFavo({
+                        publicacionId: id,
+                        clienteId: userstate?._id,
+                      })
+                    );
+                    await handleAddFavo({
+                      listingID: id,
+                      clientID: userstate?._id,
+                    });
+                    setIsFavorite(true);
+                    message.success("Se añadió a favoritos");
+                  }}
+                />
+              </>
+            )}
           </div>
           <div>
             <hr />

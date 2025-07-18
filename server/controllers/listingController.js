@@ -114,7 +114,6 @@ export const createListing = async (req, res, next) => {
       categoria,
       tipo,
       direccionCalle,
-      aptoSuite,
       municipio,
       departamento,
       pais,
@@ -128,6 +127,8 @@ export const createListing = async (req, res, next) => {
       destacado,
       descripcionDestacado,
       precio,
+      unidadPrecio,
+      tipoPublicacion,
     } = req.body;
 
     let images = [];
@@ -174,7 +175,6 @@ export const createListing = async (req, res, next) => {
       !categoria ||
       !tipo ||
       !direccionCalle ||
-      !aptoSuite ||
       !municipio ||
       !departamento ||
       !pais ||
@@ -183,7 +183,9 @@ export const createListing = async (req, res, next) => {
       !descripcion ||
       !destacado ||
       !descripcionDestacado ||
-      !precio
+      !precio ||
+      !unidadPrecio ||
+      !tipoPublicacion
     ) {
       return res.status(400).json({
         success: false,
@@ -196,7 +198,6 @@ export const createListing = async (req, res, next) => {
       categoria,
       tipo,
       direccionCalle,
-      aptoSuite,
       municipio,
       departamento,
       pais,
@@ -211,6 +212,8 @@ export const createListing = async (req, res, next) => {
       destacado,
       descripcionDestacado,
       precio,
+      unidadPrecio,
+      tipoPublicacion,
       estado: "habilitado",
     });
 
@@ -293,7 +296,7 @@ export const getMyReservations = async (req, res) => {
       .populate("clienteId", "nombre apellido email photo")
       .populate(
         "publicacionId",
-        "titulo direccionCalle municipio departamento categoria fotos "
+        "titulo direccionCalle municipio departamento categoria fotos pais"
       );
 
     if (!reservations) {
@@ -356,5 +359,62 @@ export const searchListing = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const filterListings = async (req, res, next) => {
+  try {
+    const { titulo, categoria, tipo, minPrice, maxPrice } = req.query;
+
+    const filtros = {
+      estado: "habilitado",
+    };
+
+    if (titulo || categoria) {
+      filtros.$or = [];
+
+      if (titulo) {
+        filtros.$or.push({ titulo: { $regex: titulo, $options: "i" } });
+      }
+
+      if (categoria) {
+        filtros.$or.push({ categoria: { $regex: categoria, $options: "i" } });
+      }
+    }
+    if (tipo) {
+      filtros.tipoPublicacion = tipo;
+    }
+
+    if (minPrice && maxPrice) {
+      filtros.precio = {
+        $gte: parseInt(minPrice),
+        $lte: parseInt(maxPrice),
+      };
+    }
+    const listings = await Listing.find(filtros).populate(
+      "creador",
+      "nombre apellido photo"
+    );
+
+    if (!listings || listings.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No se encontraron publicaciones con los filtros",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Filtrado exitoso",
+      total: listings.length,
+      listings,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "No se econtraron publicaciones",
+      error,
+    });
   }
 };

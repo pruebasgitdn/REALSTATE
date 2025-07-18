@@ -1,8 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setTripList, updateUser } from "../redux/state";
-import { Spin, List, Row, Col, Pagination } from "antd";
+import { Spin, Row, Col, Pagination } from "antd";
 import "../styles/TripList.css";
 import TripListCard from "../components/TripListCard";
 
@@ -13,13 +12,11 @@ const TripList = () => {
   const [pageSize] = useState(8);
   const [ss, setSs] = useState([]);
 
-  const triplist = useSelector((state) => state?.user?.user?.listaViajes) || [];
-
   const fetchList = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        "https://realstate-g3bo.onrender.com/api/booking/triplist",
+        "http://localhost:4000/api/booking/triplist",
         {
           withCredentials: true,
         }
@@ -28,8 +25,7 @@ const TripList = () => {
       if (response.status === 200) {
         console.log(response.data.success);
         console.log(response.data.total);
-        // dispatch(setTripList(response.data.data));
-        // dispatch(updateUser({ listaViajes: response.data.data }));
+
         setSs(response.data.data);
       }
     } catch (error) {
@@ -42,7 +38,6 @@ const TripList = () => {
   useEffect(() => {
     fetchList();
   }, []);
-  console.log(triplist);
 
   const formatFecha = (fecha) => {
     return new Date(fecha).toISOString().split("T")[0];

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import PropertyCard from "../components/PropertyCard.jsx";
 import "../styles/TripList.css";
+import { useNavigate } from "react-router-dom";
 
 const PropertyList = () => {
   const [loading, setLoading] = useState(false);
@@ -11,13 +12,14 @@ const PropertyList = () => {
   const [status, setStatus] = useState("habilitado");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(8);
+  const navigate = useNavigate();
 
   const fetchList = async () => {
     try {
       setLoading(true);
 
       const response = await axios.get(
-        "https://realstate-g3bo.onrender.com/api/listing/mylistings",
+        "http://localhost:4000/api/listing/mylistings",
         {
           withCredentials: true,
         }
@@ -60,22 +62,27 @@ const PropertyList = () => {
         <p>{error}</p>
       ) : filteredProperties.length > 0 ? (
         <>
-          <Select
-            className="select_pplist"
-            placeholder="Estado"
-            onChange={(value) => setStatus(value)}
-            defaultValue={"habilitado"}
-            options={[
-              {
-                value: "habilitado",
-                label: "Habilitada",
-              },
-              {
-                value: "inhabilitado",
-                label: "Inhabilitada",
-              },
-            ]}
-          />
+          <div className="flex_center">
+            <Select
+              className="select_pplist"
+              placeholder="Estado"
+              onChange={(value) => setStatus(value)}
+              defaultValue={"habilitado"}
+              options={[
+                {
+                  value: "habilitado",
+                  label: "Habilitada",
+                },
+                {
+                  value: "inhabilitado",
+                  label: "Inhabilitada",
+                },
+              ]}
+            />
+            <div>
+              <a href="/reservation_list">Reservas en mis propiedades.</a>
+            </div>
+          </div>
           <Row gutter={[16, 16]}>
             {paginatedProperties.map((item) => (
               <Col key={item._id} xs={24} sm={12} md={8} lg={6}>
@@ -89,6 +96,8 @@ const PropertyList = () => {
                   tipo={item.tipo}
                   precio={item.precio}
                   estado={item.estado}
+                  tipoPublicacion={item.tipoPublicacion}
+                  unidadPrecio={item.unidadPrecio}
                   refreshList={fetchList}
                 />
               </Col>
@@ -122,7 +131,21 @@ const PropertyList = () => {
               },
             ]}
           />
-          <p>No se encontraron publicaciones.</p>
+          <p>
+            No se encontraron publicaciones. Si tienes alguna propiedad
+            publicala
+          </p>
+
+          <div className="center_div">
+            <button
+              id="success_btn_one"
+              onClick={() => {
+                navigate("/create-listing");
+              }}
+            >
+              Publicar algo
+            </button>
+          </div>
         </>
       )}
     </div>

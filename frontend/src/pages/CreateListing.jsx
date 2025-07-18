@@ -12,6 +12,7 @@ import {
   Upload,
   InputNumber,
   message,
+  Select,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import {
@@ -53,6 +54,11 @@ import { IoIosHome } from "react-icons/io";
 import { BsDoorOpenFill, BsPersonWorkspace } from "react-icons/bs";
 import { FaRestroom } from "react-icons/fa6";
 import { FiMinus, FiPlus } from "react-icons/fi";
+import {
+  labeltipoPublicacionOpciones,
+  tipoPublicacionOpciones,
+} from "../lib/index_constants";
+import { formatPrice, parseValue } from "../lib/functions";
 
 const CreateListing = () => {
   const navigate = useNavigate();
@@ -70,6 +76,8 @@ const CreateListing = () => {
   const [guestNumber, setGuestNumber] = useState(0);
   const [roomNumber, setRoomNumber] = useState(0);
   const [bedNumber, setBedNumber] = useState(0);
+  const [saleOrRent, setSaleOrRent] = useState("");
+  const [priceUnit, setPriceUnit] = useState("");
 
   const handleFileChange = ({ fileList }) => {
     // Extrae los archivos reales de cada entrada
@@ -141,7 +149,6 @@ const CreateListing = () => {
   }, [amenities]);
 
   //inputs
-
   const handleForm = async (values) => {
     try {
       setLoading(true);
@@ -163,26 +170,34 @@ const CreateListing = () => {
       formData.append("descripcionDestacado", values?.describir_destacados);
       formData.append("precio", values?.precio);
 
+      //unidadprecio
+      //tipoPublicacion
+      if (saleOrRent === "venta") {
+        setPriceUnit("fijo");
+      }
+      formData.append("unidadPrecio", priceUnit);
+      formData.append("tipoPublicacion", saleOrRent);
+
+      //Files
       if (!fileList || fileList.length === 0) {
         message.error("Debes subir al menos una imagen.");
         return;
       }
-
       if (fileList.length > 3) {
         message.error("Solo puedes subir hasta 3 imágenes.");
         return;
       }
-
       fileList.forEach((file) => {
         formData.append("images", file);
       });
 
+      //Formdata
       formData.forEach((value, key) => {
         console.log(`${key}: ${value}`);
       });
 
       const response = await axios.post(
-        "https://realstate-g3bo.onrender.com/api/listing/createlisting",
+        "http://localhost:4000/api/listing/createlisting",
         formData,
 
         {
@@ -218,9 +233,19 @@ const CreateListing = () => {
     });
   };
 
+  const handleSelect = async (e) => {
+    setSaleOrRent(e);
+    console.log(e);
+  };
+
+  const handleSelectTwo = async (e) => {
+    setPriceUnit(e);
+    console.log(e);
+  };
+
   return (
     <>
-      <div className="center">
+      <div className="center_zzz">
         <Form layout="vertical" form={form} onFinish={handleForm}>
           <h2 className="publy">Publica tú sitio.</h2>
           <Card size="small" id="card">
@@ -437,7 +462,7 @@ const CreateListing = () => {
             <h4>Donde esta ubicado el sitio?</h4>
 
             <Row>
-              <Col span={24}>
+              <Col span={12}>
                 <Form.Item
                   name="direccion"
                   label="Direccion"
@@ -445,30 +470,15 @@ const CreateListing = () => {
                   rules={[
                     { required: true, message: "Requerido" },
                     {
-                      max: 30,
-                      message: "Maximo 30 caracteres",
+                      max: 50,
+                      message: "Maximo 50 caracteres",
                     },
                   ]}
                 >
                   <Input placeholder="Direccion de la calle" />
                 </Form.Item>
               </Col>
-              <Col span={12}>
-                <Form.Item
-                  name="apt"
-                  label="Apartamento,Suite.etc (Si aplica)"
-                  className="inpform"
-                  rules={[
-                    { required: true, message: "Requerido" },
-                    {
-                      max: 15,
-                      message: "Maximo 15 caracteres",
-                    },
-                  ]}
-                >
-                  <Input placeholder="Apt. o Suite" />
-                </Form.Item>
-              </Col>
+
               <Col span={12}>
                 <Form.Item
                   name="ciudad"
@@ -520,56 +530,50 @@ const CreateListing = () => {
             </Row>
 
             <h4>Comparte algo de informacion del lugar.</h4>
-            <Row>
-              <Col md={8} xs={8} sm={8}>
-                <Form.Item className="inpbadge">
-                  <Badge count={guestNumber} className="badge">
-                    Invitados
-                  </Badge>
-                  <br />
-                  <ButtonGroup>
-                    <Button icon={<FiMinus />} onClick={() => minusGuest()} />
-                    <Button icon={<FiPlus />} onClick={() => increaseGuest()} />
-                  </ButtonGroup>
-                </Form.Item>
-              </Col>
-              <Col md={8} xs={8} sm={8}>
-                <Form.Item className="inpbadge">
-                  <Badge count={bathNumber} className="badge">
-                    <br />
-                    Baños
-                  </Badge>
-                  <br />
-                  <ButtonGroup>
-                    <Button icon={<FiMinus />} onClick={() => minusBaths()} />
-                    <Button icon={<FiPlus />} onClick={() => increaseBaths()} />
-                  </ButtonGroup>
-                </Form.Item>
-              </Col>
-              <Col md={8} xs={8} sm={8}>
-                <Form.Item className="inpbadge">
-                  <Badge count={roomNumber} className="badge">
-                    Habitaciones
-                  </Badge>
-                  <br />
-                  <ButtonGroup>
-                    <Button icon={<FiMinus />} onClick={() => minusRoom()} />
-                    <Button icon={<FiPlus />} onClick={() => increaseRoom()} />
-                  </ButtonGroup>
-                </Form.Item>
-              </Col>
-              <Col md={24} xs={24} sm={24}>
-                <Form.Item className="inpbadge">
-                  <Badge count={bedNumber} className="badge">
-                    Camas
-                  </Badge>
-                  <br />
-                  <ButtonGroup>
-                    <Button icon={<FiMinus />} onClick={() => minusBed()} />
-                    <Button icon={<FiPlus />} onClick={() => increaseBed()} />
-                  </ButtonGroup>
-                </Form.Item>
-              </Col>
+            <Row className="container_more_minus">
+              <Form.Item className="inpbadge">
+                <Badge count={guestNumber} className="badge">
+                  Invitados
+                </Badge>
+                <br />
+                <ButtonGroup className="btngp">
+                  <Button icon={<FiMinus />} onClick={() => minusGuest()} />
+                  <Button icon={<FiPlus />} onClick={() => increaseGuest()} />
+                </ButtonGroup>
+              </Form.Item>
+
+              <Form.Item className="inpbadge">
+                <Badge count={bathNumber} className="badge">
+                  Baños
+                </Badge>
+                <br />
+                <ButtonGroup className="btngp">
+                  <Button icon={<FiMinus />} onClick={() => minusBaths()} />
+                  <Button icon={<FiPlus />} onClick={() => increaseBaths()} />
+                </ButtonGroup>
+              </Form.Item>
+
+              <Form.Item className="inpbadge">
+                <Badge count={roomNumber} className="badge">
+                  Habitaciones
+                </Badge>
+                <br />
+                <ButtonGroup className="btngp">
+                  <Button icon={<FiMinus />} onClick={() => minusRoom()} />
+                  <Button icon={<FiPlus />} onClick={() => increaseRoom()} />
+                </ButtonGroup>
+              </Form.Item>
+
+              <Form.Item className="inpbadge">
+                <Badge count={bedNumber} className="badge">
+                  Camas
+                </Badge>
+                <br />
+                <ButtonGroup className="btngp">
+                  <Button icon={<FiMinus />} onClick={() => minusBed()} />
+                  <Button icon={<FiPlus />} onClick={() => increaseBed()} />
+                </ButtonGroup>
+              </Form.Item>
             </Row>
           </Card>
 
@@ -912,31 +916,109 @@ const CreateListing = () => {
                   <TextArea rows={4} placeholder="..." />
                 </Form.Item>
               </Col>
-              <Col xs={24}>
-                <div className="centero">
-                  <Form.Item
-                    label="Ahora, ponle el precio."
-                    name="precio"
-                    rules={[{ required: true, message: "Ingrese el precio" }]}
-                  >
-                    <InputNumber
-                      placeholder="$"
-                      className="inputnumber"
-                      size="large"
-                    />
-                  </Form.Item>
-                </div>
-              </Col>
-              <Col xs={24}>
-                <Button
-                  htmlType="submit"
-                  loading={loading}
-                  block
-                  id="createbutton"
+            </Row>
+            <h4>Tipo de publicación y precios</h4>
+            <Row>
+              <div className="centero">
+                <Form.Item
+                  label="Tipo de publicacion."
+                  name="tipoPublicacion"
+                  rules={[{ required: true, message: "Campo obligatorio" }]}
                 >
-                  Crear publicacion
-                </Button>
-              </Col>
+                  <Select
+                    defaultValue={""}
+                    options={tipoPublicacionOpciones}
+                    onChange={handleSelect}
+                  />
+                </Form.Item>
+
+                {saleOrRent === "alquiler" ? (
+                  <>
+                    <Form.Item
+                      label="Precio por."
+                      name="unidadPrecio"
+                      rules={[{ required: true, message: "Campo obligatorio" }]}
+                    >
+                      <Select
+                        options={
+                          saleOrRent === "alquiler"
+                            ? labeltipoPublicacionOpciones.filter(
+                                (p) => p.label !== "Fijo"
+                              )
+                            : labeltipoPublicacionOpciones
+                        }
+                        onChange={handleSelectTwo}
+                      />
+                    </Form.Item>
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                {saleOrRent === "venta" ? (
+                  <>
+                    <Form.Item
+                      label="Precio por."
+                      name="unidadPrecio"
+                      rules={
+                        saleOrRent === "venta"
+                          ? []
+                          : [
+                              {
+                                required: true,
+                                message: "Campo obligatorio",
+                              },
+                            ]
+                      }
+                    >
+                      <Select
+                        options={labeltipoPublicacionOpciones}
+                        defaultValue={saleOrRent === "venta" ? "Fijo" : ""}
+                        value={"Fijo"}
+                        disabled={saleOrRent === "venta"}
+                        onChange={handleSelectTwo}
+                      />
+                    </Form.Item>
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                {saleOrRent !== "" ? (
+                  <>
+                    <Form.Item
+                      label="Ahora, ponle el precio."
+                      name="precio"
+                      rules={[{ required: true, message: "Ingrese el precio" }]}
+                    >
+                      <InputNumber
+                        placeholder="$"
+                        className="inputnumber"
+                        size="large"
+                        formatter={(value) =>
+                          `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
+                        parser={(value) =>
+                          value === null || value === void 0
+                            ? void 0
+                            : value.replace(/\$\s?|(,*)/g, "")
+                        }
+                      />
+                    </Form.Item>
+                  </>
+                ) : (
+                  <></>
+                )}
+              </div>
+
+              <Button
+                htmlType="submit"
+                loading={loading}
+                block
+                id="createbutton"
+              >
+                Crear publicacion
+              </Button>
             </Row>
           </Card>
         </Form>

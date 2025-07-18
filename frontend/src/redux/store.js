@@ -1,20 +1,30 @@
 // store.js
-import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./state";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import userReducer from "./userState.js";
+import favoReducer from "./favoState.js";
+
+import storage from "redux-persist/lib/storage";
+import { persistReducer, persistStore } from "redux-persist";
+
+const persistConfig = {
+  key: "root",
+  storage,
+  whitelist: ["user", "favorites"], // estados
+};
+
+const rootReducer = combineReducers({
+  user: userReducer,
+  favorites: favoReducer,
+});
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
   reducer: {
-    user: userReducer, // Define el reducer aquí
+    persistedReducer,
   },
   devTools: process.env.NODE_ENV !== "production",
 });
 
-store.subscribe(() => {
-  const state = store.getState();
-  if (state.user?.user) {
-    localStorage.setItem("user", JSON.stringify(state.user.user));
-    localStorage.setItem("token", state.user.token);
-  }
-});
-
+export const persistor = persistStore(store);
 export default store;

@@ -13,12 +13,13 @@ const FavoCard = ({
   departamento,
   pais,
   precio,
+  direccionCalle,
   handleRemove,
 }) => {
   const navigate = useNavigate();
 
   return (
-    <>
+    <div className="">
       <Card
         className="tripcardlist"
         onClick={() => {
@@ -42,16 +43,18 @@ const FavoCard = ({
           <h3 id="placetrip">
             {municipio} {departamento} - {pais}
           </h3>
-          <div className="categorydiv">
-            <h4>{category[categoria]}</h4>
-            {categoryIcons[categoria] && (
-              <span id="icntrip">{categoryIcons[categoria]}</span>
-            )}{" "}
+          <p id="kk">{direccionCalle}</p>
+          <div className="plac">
+            <div className="calvo">
+              <h4>{category[categoria]}</h4>
+              {categoryIcons[categoria] && (
+                <span id="icntrip">{categoryIcons[categoria]}</span>
+              )}
+            </div>
+            <div>
+              <h4>{type_Place[tipo]}</h4>
+            </div>
           </div>
-          <div className="categorydiv">
-            <h4>{type_Place[tipo]}</h4>
-          </div>
-          <h3 id="placetrip">{precio} COP MENSUAL</h3>
 
           <div className="center">
             <Button
@@ -67,7 +70,7 @@ const FavoCard = ({
           </div>
         </div>
       </Card>
-    </>
+    </div>
   );
 };
 

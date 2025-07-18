@@ -38,26 +38,21 @@ p {
 
 .listcard {
   width: 90%;
-  padding: 10px;
+  display: inline-flex;
+  position: relative;
+  justify-content: center;
   text-align: center;
-  transition: box-shadow 0.3s;
-  height: 100%;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.405);
   img {
     border-radius: 10px;
-    width: 180px;
-    height: 150px;
+    width: 150px;
+    height: 180px;
     object-fit: cover;
   }
   h4 {
-    font-size: 15px;
     color: black;
     font-style: normal;
     font-weight: 500;
-  }
-  &:hover {
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.405);
-    cursor: pointer;
-    border-radius: 10px;
   }
 }
 
@@ -186,7 +181,8 @@ p {
 
 .werma .slick-prev,
 .werma .slick-next {
-  color: #000;
+  color: #000000;
+  font-weight: 900;
   z-index: 1;
 }
 
@@ -284,10 +280,19 @@ p {
 .btn_vmas {
   background-color: rgb(0, 5, 61);
   color: white;
-  width: 50%;
+  width: auto;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 20px;
   &:hover {
     background-color: rgb(8, 20, 154);
   }
+}
+
+.container_bvmas {
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
 }
 
 @media (min-width: 1200px) {

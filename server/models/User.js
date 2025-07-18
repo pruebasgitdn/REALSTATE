@@ -26,26 +26,12 @@ const UserSchema = new mongoose.Schema(
     photo: {
       public_id: {
         type: String,
+        default: "",
       },
       url: {
         type: String,
+        default: "",
       },
-    },
-    listaViajes: {
-      type: Array,
-      default: [],
-    },
-    listaDeseos: {
-      type: Array,
-      default: [],
-    },
-    listaPropiedades: {
-      type: Array,
-      default: [],
-    },
-    listaReservas: {
-      type: Array,
-      default: [],
     },
   },
   { timestamps: true }

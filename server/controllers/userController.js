@@ -1,4 +1,5 @@
 import { Listing } from "../models/Listings.js";
+import { Favorites } from "../models/Favorites.js";
 import { User } from "../models/User.js";
 import { generateToken } from "../utils/jwtToken.js";
 import cloudinary from "cloudinary";
@@ -176,67 +177,6 @@ export const GetLlistingById = async (req, res, next) => {
   }
 };
 
-export const addToWhisList = async (req, res, next) => {
-  try {
-    const { listingId } = req.body;
-    if (!listingId) {
-      return res.status(400).json({
-        success: false,
-        message: "Debes proporcionar un ID del listado",
-      });
-    }
-    console.log("Body:", listingId);
-    const rr = req.user;
-    const idd = rr.id;
-
-    const seekUser = await User.findById(idd);
-    if (!seekUser) {
-      return res.status(400).json({
-        succes: false,
-        message: "No se encontro en usuario",
-      });
-    }
-
-    const listing = await Listing.findById(listingId);
-
-    if (!listing) {
-      return res.status(400).json({
-        succes: false,
-        message: "No se encontro la publicacion",
-      });
-    }
-
-    //findinex el 1er indice de la condicion en el arrego listaDeseos, exito => devuelve el indice, no existe => -1
-    const favoriteIndex = seekUser.listaDeseos.findIndex(
-      (item) => item.toString() === listingId
-    );
-
-    //diferente de -1 entonces exito (ya existe)
-    if (favoriteIndex !== -1) {
-      //borrar desde el indice 1 elemento
-      seekUser.listaDeseos.splice(favoriteIndex, 1);
-      await seekUser.save();
-      return res.status(200).json({
-        success: true,
-        message: "El listado se eliminó de la lista de deseos",
-        wishList: seekUser.listaDeseos,
-      });
-    } else {
-      // Si no está, agregarlo
-      seekUser.listaDeseos.push(listingId);
-      await seekUser.save();
-      return res.status(200).json({
-        success: true,
-        message: "El listado se agregó a la lista de deseos",
-        wishList: seekUser.listaDeseos,
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    next(error);
-  }
-};
-
 export const editProfile = async (req, res, next) => {
   try {
     const id = req.user.id;
@@ -298,3 +238,170 @@ export const editProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+export const nazi = async (req, res, next) => {
+  try {
+    const nuevoUsuario = new User({
+      nombre: "Tony",
+      apellido: "Krooz",
+      email: "tony@correo.com",
+      password: "123456",
+    });
+
+    await nuevoUsuario.save();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getUsers = async (req, res, next) => {
+  try {
+    const pp = await User.find();
+
+    if (pp.length <= 0) {
+      res.status(404).json({
+        success: false,
+        message: "No nada",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Melos tio",
+      pp,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addToFavoDB = async (req, res, next) => {
+  try {
+    const { clientID, listingID } = req.body;
+
+    const newItem = new Favorites({
+      clienteId: clientID,
+      publicacionId: listingID,
+    });
+
+    const response = await newItem.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Melos tio",
+      response,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Error al añadir a favoritos",
+      error: error.message,
+    });
+  }
+};
+
+export const removeFromFavoDB = async (req, res, next) => {
+  try {
+    const { clientID, listingID } = req.body;
+
+    const deletedItem = await Favorites.findOneAndDelete({
+      clienteId: clientID,
+      publicacionId: listingID,
+    });
+
+    if (!deletedItem) {
+      return res.status(404).json({
+        success: false,
+        message: "No se encontro el favorito para eliminar",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Favorito eliminado correctamente",
+      data: deletedItem,
+    });
+  } catch (error) {
+    console.error("Error eliminando favorito:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error del servidor",
+      error: error.message,
+    });
+  }
+};
+
+export const getUsersFavo = async (req, res, next) => {
+  try {
+    const idc = req.user.id;
+    const response = await Favorites.find({
+      clienteId: idc,
+    }).select("clienteId publicacionId -_id");
+    // .populate(
+    //   "publicacionId",
+    //   "titulo creador categoria departamento municipio pais"
+    // );
+    if (!response || response.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No se encontraron elementos",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Items encontrados",
+      response,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Error del servidor",
+      error: error.message,
+    });
+  }
+};
+
+export const getUsersFavoTT = async (req, res, next) => {
+  try {
+    const userID = req.user.id;
+
+    if (!userID) {
+      return res.status(500).json({
+        success: false,
+        message: "Proporcione userID",
+        error: error.message,
+      });
+    }
+
+    const response = await Favorites.find({
+      clienteId: userID,
+    }).populate(
+      "publicacionId",
+      "titulo fotos creador categoria tipo direccionCalle municipio departamento pais "
+    );
+
+    if (!response || response.length === 0) {
+      return res.status(500).json({
+        success: false,
+        message: "No se encontraron publicaciones",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Melos",
+      response,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Error del servidor",
+      error: error.message,
+    });
+  }
+};
+
+// export const

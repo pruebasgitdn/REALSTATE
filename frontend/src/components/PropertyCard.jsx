@@ -3,6 +3,7 @@ import { Carousel, Card, Button, Popconfirm, Select, message } from "antd";
 import { category, categoryIcons, type_Place } from "../constants.js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { formatPrice } from "../lib/functions.js";
 
 const PropertyCard = ({
   id,
@@ -15,6 +16,8 @@ const PropertyCard = ({
   precio,
   estado,
   refreshList,
+  tipoPublicacion,
+  unidadPrecio,
 }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -25,7 +28,7 @@ const PropertyCard = ({
       const newStatus = estado === "habilitado" ? "inhabilitado" : "habilitado";
 
       const response = await axios.put(
-        `https://realstate-g3bo.onrender.com/api/listing/property_setstatus/${id}`,
+        `http://localhost:4000/api/listing/property_setstatus/${id}`,
         {
           estado: newStatus,
         },
@@ -40,9 +43,7 @@ const PropertyCard = ({
       }
     } catch (error) {
       if (error) {
-        if (error.response || error.response.data) {
-          message.error(error.response.data.message);
-        }
+        message.error(error.message);
       }
 
       console.log(error);
@@ -71,16 +72,31 @@ const PropertyCard = ({
           <h3 id="placetrip">
             {municipio} {departamento} - {pais}
           </h3>
-          <div className="categorydiv">
-            <h4>{category[categoria]}</h4>
-            {categoryIcons[categoria] && (
-              <span id="icntrip">{categoryIcons[categoria]}</span>
-            )}{" "}
-          </div>
-          <div className="categorydiv">
+          <div className="morir_con_estilo">
+            <div className="pecheras_g">
+              <h4>{category[categoria]}</h4>
+              {categoryIcons[categoria] && (
+                <span id="icntrip">{categoryIcons[categoria]}</span>
+              )}
+            </div>
             <h4>{type_Place[tipo]}</h4>
           </div>
-          <h3 id="placetrip">{precio} X MES</h3>
+
+          {tipoPublicacion === "venta" ? (
+            <div className="flex_center">
+              <h3 id="th_w">
+                {formatPrice(precio)} {unidadPrecio}
+              </h3>
+              <button id="nini">{tipoPublicacion}</button>
+            </div>
+          ) : (
+            <div className="flex_center">
+              <h3 id="th_w">
+                {formatPrice(precio)} X {unidadPrecio}
+              </h3>
+              <button id="nini">{tipoPublicacion}</button>
+            </div>
+          )}
 
           <div id="bbt">
             <hr />

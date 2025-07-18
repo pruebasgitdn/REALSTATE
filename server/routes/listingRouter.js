@@ -3,6 +3,7 @@ import { verifyUserToken } from "../middleware/authMiddleware.js";
 import {
   AllPropertys,
   createListing,
+  filterListings,
   GetLlistingById,
   getMyReservations,
   ListingsHomeByCategory,
@@ -25,5 +26,6 @@ router.put("/property_setstatus/:id", verifyUserToken, setStatus);
 router.get("/my_reservations", verifyUserToken, getMyReservations);
 
 router.get("/search", searchListing);
+router.get("/filter", filterListings);
 
 export default router;

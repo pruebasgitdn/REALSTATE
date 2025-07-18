@@ -4,7 +4,7 @@ import "../styles/EditProfile.css";
 import { HiCloudArrowUp } from "react-icons/hi2";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-import { updateUser } from "../redux/state";
+import { updateUser } from "../redux/userState.js";
 
 const EditProfile = () => {
   const [form] = Form.useForm();
@@ -33,7 +33,7 @@ const EditProfile = () => {
       setLoadingBtn(true);
 
       const response = await axios.put(
-        "https://realstate-g3bo.onrender.com/api/user/edit_profile",
+        "http://localhost:4000/api/user/edit_profile",
         formDataToSend,
         {
           withCredentials: true,
@@ -44,6 +44,7 @@ const EditProfile = () => {
         const userData = await response.data.user;
         console.log("Registro exitoso", userData);
         dispatch(updateUser(response.data.user));
+        message.success("Perfil actualizado con exito");
       }
       // formDataToSend.forEach((index, values) => {
       //   console.log(index, values);
@@ -58,7 +59,7 @@ const EditProfile = () => {
     }
   };
 
-  const user = useSelector((state) => state?.user?.user);
+  const user = useSelector((state) => state?.persistedReducer?.user?.user);
   console.log(user);
 
   useEffect(() => {
@@ -152,17 +153,18 @@ const EditProfile = () => {
               </Form.Item>
             </Col>
 
-            <div className="center">
+            <div className="ppp">
               <Upload
                 beforeUpload={handlePhoto}
                 maxCount={1}
                 listType="picture"
+                className="btn_upload"
                 accept=".jpg, .jpeg, .png"
               >
                 <Button
                   iconPosition="end"
-                  block
-                  size="middle"
+                  size="small"
+                  className="btn_nb"
                   icon={<HiCloudArrowUp size={30} />}
                 >
                   Sube tu foto

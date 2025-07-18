@@ -5,6 +5,7 @@ import { dbConnection } from "./database/dbConnection.js";
 import userRouter from "./routes/userRouter.js";
 import bookingRouter from "./routes/bookingRouter.js";
 import listingRouter from "./routes/listingRouter.js";
+import checkoutRouter from "./routes/checkoutRouter.js";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 
@@ -14,7 +15,7 @@ config({ path: "./config.env" });
 
 app.use(
   cors({
-    origin: ["https://realstate-1.onrender.com", "http://localhost:3000"],
+    origin: ["http://localhost:3000"],
     methods: ["PUT", "DELETE", "POST", "GET"],
     credentials: true,
   })
@@ -34,6 +35,7 @@ app.use(
 app.use("/api/user", userRouter);
 app.use("/api/booking", bookingRouter);
 app.use("/api/listing", listingRouter);
+app.use("/api/checkout", checkoutRouter);
 
 dbConnection();
 

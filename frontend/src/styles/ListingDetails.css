@@ -5,7 +5,7 @@
 }
 
 .imgdetail {
-  width: 70vw;
+  width: 95%;
   height: 60vh;
   border-radius: 10px;
   margin: 0 auto;
@@ -20,8 +20,9 @@
 }
 
 .divlistings {
-  background-color: rgb(18, 15, 73);
+  /* background-color: rgb(18, 15, 73); */
   /* background-color: brown; */
+  background-color: rgb(228, 227, 227);
   width: 100%;
   height: 100%;
   display: flex;
@@ -35,13 +36,15 @@
   /* align-items: center; */
   gap: 8px;
 }
-
+.jaja {
+  width: 100%;
+}
 .div_calendar_details {
   padding: 5px;
   background-color: rgb(207, 205, 205);
   display: flex;
+
   flex-direction: column;
-  /* gap: 5px; */
   border-radius: 10px;
 
   h2 {
@@ -80,7 +83,8 @@
   margin: 0 auto;
 }
 #card_item {
-  width: 90%;
+  /* width: 70%; */
+  width: auto;
   margin: 0 auto;
   margin-top: 10px;
   margin-bottom: 10px;
@@ -91,6 +95,12 @@
   h3 {
     color: black;
   }
+}
+#venta_div {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .quantity_list {
@@ -103,11 +113,9 @@
 
 .header_list {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
 }
 
-.amenities {
-}
 .desc {
   display: flex;
   flex-direction: column;
@@ -131,20 +139,32 @@
   }
 }
 
-/* Pantallas anchas (monitores grandes) */
-@media (min-width: 1200px) {
-  /* Ajustes finales para monitores grandes */
+@media only screen and (max-width: 600px) {
+  #card_item {
+    width: 90%;
+  }
 }
 
-/* Laptops y desktops */
-@media (min-width: 1024px) {
-  /* Cambios para pantallas más grandes */
+@media only screen and (min-width: 600px) {
+  #card_item {
+    width: 70%;
+  }
 }
 
-@media (min-width: 768px) {
-  /* Cambios para tablets */
+@media only screen and (min-width: 768px) {
+  #card_item {
+    width: 75%;
+  }
 }
 
-/* Opcional: para móviles más pequeños */
-@media (max-width: 480px) {
+@media only screen and (min-width: 1024px) {
+  #card_item {
+    width: 75%;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  #card_item {
+    width: 75;
+  }
 }

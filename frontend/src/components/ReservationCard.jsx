@@ -4,8 +4,9 @@ import "../styles/TripListCard.css";
 import { category, categoryIcons } from "../constants";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-import { updateUser } from "../redux/state.js";
+import { updateUser } from "../redux/userState.js";
 import { useNavigate } from "react-router-dom";
+import { formatPrice } from "../lib/functions.js";
 
 const ReservationCard = ({
   id,
@@ -30,7 +31,7 @@ const ReservationCard = ({
           <Carousel infinite={false} arrows className="werma">
             {fotos.map((foto, index) => (
               <div key={index}>
-                <img src={foto.url} alt={`Foto`} className="trlstimg" />
+                <img src={foto?.url} alt={`Foto`} className="trlstimg" />
               </div>
             ))}
           </Carousel>
@@ -43,29 +44,25 @@ const ReservationCard = ({
           <h3 id="placetrip">
             {municipio} en {departamento} - {pais}
           </h3>
-          <div className="nav_flex">
+          <div className="bbt">
             <h4>{category[categoria]}</h4>
             {categoryIcons[categoria] && (
               <span id="icntrip">{categoryIcons[categoria]}</span>
-            )}{" "}
-            <hr />
+            )}
+          </div>
+
+          <div className="space_btwn">
+            <p>{fechaInicio}</p>-<p>{fechaFin}</p>
           </div>
 
           <div className="categorydiv">
             <h4>
               Reservado por: {clienteNombre} {clienteApellido} {}
             </h4>
-            <Avatar src={clienteFoto.url} size={30} />
+            <Avatar src={clienteFoto?.url} size={30} />
           </div>
 
-          <h4 id="fechapt">
-            {fechaInicio} - {fechaFin}
-          </h4>
-          <div className="pricediv">
-            <h4 id="preciopt">$ {precioTotal} Total</h4>
-          </div>
           <div>
-            <hr />
             <Button
               block
               type="primary"

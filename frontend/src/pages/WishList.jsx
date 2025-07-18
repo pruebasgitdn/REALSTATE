@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Spin, Row, Col, Pagination, message } from "antd"; // Asegúrate de importar Row y Col
-import axios from "axios";
+import { Spin, Row, Col, Pagination, message } from "antd";
 import FavoCard from "../components/FavoCard";
-import { updateUser } from "../redux/state";
+import { getUserFavoListing, handleRemoveFavo } from "../lib/functions.js";
+import { removeFromFavo } from "../redux/favoState.js";
 
 const WishList = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-  const [error, setError] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(8);
@@ -18,29 +17,20 @@ const WishList = () => {
   //del estado para mostrar por pagina cortamos desde el indice hasta indice mas 8 osea mostrar 8 elementos
   const currentData = data.slice(startIndex, startIndex + pageSize);
 
-  const user = useSelector((state) => state?.user?.user);
+  const user = useSelector((state) => state?.persistedReducer?.user?.user);
 
   const fetchList = async () => {
     try {
       setLoading(true);
-      setError(null);
-      if (user?.listaDeseos?.length > 0) {
-        // Resolver todas las promesas de la lista de deseos
-        const responses = await Promise.all(
-          user.listaDeseos.map((id) =>
-            axios.get(
-              `https://realstate-g3bo.onrender.com/api/listing/property_id/${id}`
-            )
-          )
-        );
-        const listingsData = responses.map((res) => res.data.listings); // Extraer las publicaciones
-        setData(listingsData);
-      } else {
-        setData([]);
-      }
+      const rr_try = await getUserFavoListing();
+      // setRquest(rr_try.data.response);
+      const extractedPublicaciones = rr_try.data.response.map(
+        (item) => item.publicacionId
+      );
+      console.log(rr_try);
+      setData(extractedPublicaciones);
     } catch (error) {
-      console.error("Error fetching wish list:", error);
-      setError("Hubo un problema al cargar la lista de deseos.");
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -52,21 +42,12 @@ const WishList = () => {
     setData(updatedData);
 
     try {
-      const response = await axios.put(
-        "https://realstate-g3bo.onrender.com/api/user/whishlist_add",
-        { listingId: id },
-        {
-          withCredentials: true,
-        }
-      );
-
-      if (response.status === 200) {
-        const updatedWishList = response.data.wishList;
-        message.info(response.data.message);
-
-        // await fetchList();
-        dispatch(updateUser({ listaDeseos: updatedWishList }));
-      }
+      dispatch(removeFromFavo(id));
+      await handleRemoveFavo({
+        listingID: id,
+        clientID: user._id,
+      });
+      message.info("Se removió de favoritos");
     } catch (error) {
       console.log(error);
       message.error("Error");
@@ -83,8 +64,6 @@ const WishList = () => {
       <h2 className="tptitle">Lista de Favoritos</h2>
       {loading ? (
         <Spin size="large" style={{ display: "block", margin: "auto" }} />
-      ) : error ? (
-        <p>{error}</p>
       ) : data.length > 0 ? (
         <>
           <Row gutter={[16, 16]}>
@@ -99,6 +78,7 @@ const WishList = () => {
                   pais={item.pais}
                   tipo={item.tipo}
                   precio={item.precio}
+                  direccionCalle={item.direccionCalle}
                   handleRemove={handleRemove}
                 />
               </Col>

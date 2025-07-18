@@ -11,23 +11,17 @@ import {
 import { IoLayers } from "react-icons/io5";
 import { IoPersonCircle } from "react-icons/io5";
 import React, { useEffect } from "react";
-import { setLogout } from "../redux/state";
+import { setLogout } from "../redux/userState.js";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { clearFavo } from "../redux/favoState.js";
 
 const NavBar = () => {
   const navigate = useNavigate();
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      dispatch(setLogout());
-    }
-  }, []);
-
-  const user = useSelector((state) => state.user);
-
+  const user = useSelector((state) => state.persistedReducer.user);
   const dispatch = useDispatch();
+  console.log(user);
 
   const menuItems = user?.user
     ? [
@@ -42,7 +36,7 @@ const NavBar = () => {
         {
           key: "3",
           label: (
-            <a rel="noopener noreferrer" href="/edit_profile">
+            <a rel="noopener noreferrer" className="back" href="/edit_profile">
               Editar perfil
             </a>
           ),
@@ -55,12 +49,11 @@ const NavBar = () => {
             </a>
           ),
         },
-
         {
-          key: "5",
+          key: "45",
           label: (
-            <a rel="noopener noreferrer" href="/trip_list">
-              Mis Viajes
+            <a rel="noopener noreferrer" href="/my_sales">
+              Compras / Historial
             </a>
           ),
         },
@@ -68,7 +61,7 @@ const NavBar = () => {
         {
           key: "25",
           label: (
-            <a rel="noopener noreferrer" href="/reservation_list">
+            <a rel="noopener noreferrer" href="/trip_list">
               Reservas
             </a>
           ),
@@ -106,20 +99,19 @@ const NavBar = () => {
   const handleLogout = async () => {
     try {
       const response = await axios.get(
-        "https://realstate-g3bo.onrender.com/api/user/logout",
+        "http://localhost:4000/api/user/logout",
         {
           withCredentials: true, // Importante para incluir cookies
         }
       );
       if (response.status === 200) {
         message.info("Has salido de la sesion");
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
         dispatch(setLogout());
+        dispatch(clearFavo());
         navigate("/");
       }
     } catch (error) {
-      console.error("Error al cerrar sesión:", error.response?.data || error);
+      console.error("Error al cerrar sesión:", error);
     }
   };
 
@@ -137,7 +129,7 @@ const NavBar = () => {
     <div className="naza">
       <Col className="">
         <Link to="/">
-          <img src="/assets/logo.png" id="logo" />
+          <img src="/assets/logo.png" id="logo" alt="Melos" />
         </Link>
       </Col>
       <Col className="" id="searchbar">
@@ -146,37 +138,31 @@ const NavBar = () => {
 
       <Col className="">
         {user?.user ? (
-          <>
-            <div className="nav_flex">
-              <div className="nav_user">
-                <h4>{user?.user?.nombre}</h4>
-                <Avatar
-                  size={35}
-                  src={user?.user?.photo?.url || "/assets/avatar.png"}
-                />
-              </div>
-
-              <div className="nav_user">
-                <Button size="small" danger onClick={() => handleLogout()}>
-                  Salir
-                </Button>
-
-                <Dropdown
-                  placement="bottomRight"
-                  arrow={{
-                    pointAtCenter: true,
-                  }}
-                  overlay={menu}
-                  trigger={["hover"]}
-                >
-                  <Space>
-                    <IoPersonCircle size={25} />
-                    <IoLayers size={25} />
-                  </Space>
-                </Dropdown>
-              </div>
+          <div className="container_nav_user">
+            <div className="">
+              <Dropdown
+                placement="bottomRight"
+                arrow={{
+                  pointAtCenter: true,
+                }}
+                overlay={menu}
+                trigger={["hover"]}
+              >
+                <Space>
+                  <div className="nav_user">
+                    <h4>{user?.user?.nombre}</h4>
+                    <Avatar
+                      size={35}
+                      src={user?.user?.photo?.url || "/assets/avatar.png"}
+                    />
+                  </div>
+                </Space>
+              </Dropdown>
             </div>
-          </>
+            <Button size="small" danger onClick={() => handleLogout()}>
+              Salir
+            </Button>
+          </div>
         ) : (
           <>
             <div className="nav_flex">
