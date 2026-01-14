@@ -1,11 +1,9 @@
 import React from "react";
 import { formatDate } from "../lib/functions";
 import { Avatar } from "antd";
-import { useNavigate } from "react-router-dom";
 import { IoDocument } from "react-icons/io5";
 
 const SalesOrderCard = ({ item }) => {
-  const navigate = useNavigate();
   return (
     <div className="sales_order_card">
       <div className="j_btn">
@@ -15,13 +13,7 @@ const SalesOrderCard = ({ item }) => {
       <hr id="koko" />
       <h4>Anterior propietario</h4>
       <div className="info_sso">
-        <button
-          type="button"
-          id="noend"
-          onClick={() => {
-            navigate(`/get_user/${item?.antiguoPropID?._id}`);
-          }}
-        >
+        <a id="alinkpp" href={`/get_user/${item?.nuevoPropId?._id}`}>
           <strong>Email:</strong>
           {item.antiguoPropID.email}
           {item.antiguoPropID?.photo?.url !== null ||
@@ -37,7 +29,7 @@ const SalesOrderCard = ({ item }) => {
           ) : (
             <></>
           )}
-        </button>
+        </a>
         <div className="sub_sso">
           <span>Nombre:</span> <p>{item.antiguoPropID.nombre}</p>
         </div>{" "}
