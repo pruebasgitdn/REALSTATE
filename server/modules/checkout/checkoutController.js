@@ -10,6 +10,11 @@ import { createBookingService } from "../bookings/bookingController.js";
 
 const router = express.Router();
 
+const isDev = process.env.NODE_ENV !== "production";
+const clientOrigin = isDev
+  ? process.env.FRONTEND_URI_DEV
+  : process.env.FRONTEND_URI;
+
 export const goToPay = async (req, res, next) => {
   try {
     const { item } = await req.body;
@@ -68,8 +73,8 @@ export const goToPay = async (req, res, next) => {
       payment_method_types: ["card"],
       line_items: extractingItems,
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URI_DEV}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URI_DEV}/cancel`,
+      success_url: `${clientOrigin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${clientOrigin}/cancel`,
       metadata: {
         pub_id,
         antiguoprop_id,
@@ -257,8 +262,8 @@ export const gotoPayBooking = async (req, res, next) => {
       payment_method_types: ["card"],
       line_items: [extractingItems],
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URI_DEV}/successbooking?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URI_DEV}/cancel`,
+      success_url: `${clientOrigin}/successbooking?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${clientOrigin}/cancel`,
       metadata: {
         publicacionId: item._id || item.id,
         owner_id,
