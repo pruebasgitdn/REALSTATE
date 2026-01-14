@@ -1,0 +1,9 @@
+.tptitle {
+  text-align: center;
+  color: rgb(0, 5, 61);
+  font-weight: 400;
+}
+
+.pagination {
+  margin-top: 10px;
+}

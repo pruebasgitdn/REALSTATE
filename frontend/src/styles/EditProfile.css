@@ -1,0 +1,109 @@
+.editprocard {
+  margin: 0 auto;
+  width: 40%;
+  padding: 0px;
+}
+
+#btn_submit {
+  background-color: rgb(7, 201, 7);
+  color: white;
+  border: none;
+  display: flex;
+  margin: 0 auto;
+  width: auto;
+  text-transform: uppercase;
+  &:focus {
+    outline: none;
+  }
+  &:hover {
+    background-color: rgb(5, 118, 18);
+  }
+  &:disabled {
+    background-color: rgb(169, 161, 161);
+    cursor: not-allowed;
+    color: black;
+  }
+}
+.btn_upload {
+  width: 100%;
+}
+
+.gbale {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin: 10px 0px;
+  padding: 0px;
+  background-color: rgb(226, 221, 221);
+  h4 {
+    margin: 0px;
+    padding: 0px;
+    font-style: normal;
+    display: block;
+    width: 100%;
+    color: black;
+  }
+}
+
+.edpimg {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.gfen {
+  width: max-content;
+}
+.btn_nb {
+  border: dashed rgb(18, 117, 188) 1px;
+  width: 100%;
+  color: rgb(18, 117, 188);
+}
+.ppp {
+  width: 100%;
+  display: flex;
+}
+.container_tplist {
+  background-color: rgb(228, 227, 227);
+  width: 100%;
+  height: 100vh;
+  padding-right: 15px;
+  padding-left: 15px;
+  overflow-x: hidden;
+  /* overflow-y: hidden; */
+  padding-bottom: 5px;
+  h2 {
+    text-align: center;
+    color: rgb(0, 5, 61);
+    font-weight: 400;
+  }
+}
+
+@media (max-width: 1200px) {
+  /* Ajustes finales para monitores grandes */
+  .editprocard {
+  }
+}
+
+/* Laptops y desktops */
+@media (max-width: 1024px) {
+  /* Cambios para pantallas más grandes */
+  .editprocard {
+    width: 70%;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Cambios para tablets */
+  .editprocard {
+    width: 80%;
+  }
+}
+
+/* Opcional: para móviles más pequeños */
+@media (max-width: 600px) {
+  .editprocard {
+    width: 90%;
+  }
+}

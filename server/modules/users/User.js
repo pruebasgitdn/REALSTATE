@@ -1,0 +1,70 @@
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+const UserSchema = new mongoose.Schema(
+  {
+    nombre: {
+      type: String,
+      required: true,
+      minLength: [3, "El nombre debe tener al menos 3 caracteres"],
+    },
+    apellido: {
+      type: String,
+      required: true,
+      minLength: [3, "El apellido debe tener al menos 3 caracteres"],
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    photo: {
+      public_id: {
+        type: String,
+        default: "",
+      },
+      url: {
+        type: String,
+        default: "",
+      },
+    },
+  },
+  { timestamps: true }
+);
+
+//HASHEAR
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+  this.password = await bcrypt.hash(this.password, 10);
+});
+
+//Comparar
+UserSchema.methods.comparePassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+//Generar JSONTOKEN
+UserSchema.methods.generateJWT = function () {
+  //Firma el token con el _id
+  return jwt.sign(
+    {
+      id: this._id,
+      nombre: this.nombre,
+      apellido: this.apellido,
+      email: this.email,
+    },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: process.env.JWT_EXPIRES,
+    }
+  );
+};
+
+export const User = mongoose.model("User", UserSchema);
