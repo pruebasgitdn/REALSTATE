@@ -147,21 +147,29 @@ export const userLogin = async (req, res, next) => {
 };
 
 export const logout = async (req, res, next) => {
+  const cookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    expires: new Date(0),
+  };
+
   res
     .status(200)
-    .cookie("userToken", "", {
-      httpOnly: true,
-      expires: new Date(Date.now()),
-    })
+    .cookie("userToken", "", cookieOptions)
     .cookie("isLoggedIn", "", {
-      httpOnly: false,
-      expires: new Date(Date.now()),
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      expires: new Date(0),
     })
     .json({
       success: true,
-      message: "Sesión cerrada correctamente",
+      message: "Sesion cerrada correctamente",
     });
-  console.log("Sesion cerrada!");
+
+  console.log("Sesion cerrada correctamente");
 };
 
 export const me = async (req, res, next) => {
