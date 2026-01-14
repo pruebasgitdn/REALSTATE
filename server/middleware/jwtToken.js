@@ -8,7 +8,7 @@ export const generateToken = (user, message, statusCode, res) => {
     maxAge: 1000 * 60 * 60 * 24 * 7,
     httpOnly: true,
     secure: true,
-    sameSite: "lax",
+    sameSite: "none",
     path: "/",
   };
 
@@ -18,7 +18,7 @@ export const generateToken = (user, message, statusCode, res) => {
     .cookie("isLoggedIn", "true", {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
     })
     .json({

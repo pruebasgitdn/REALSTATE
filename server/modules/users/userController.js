@@ -150,7 +150,7 @@ export const logout = async (req, res, next) => {
   const cookieOptions = {
     httpOnly: true,
     secure: true,
-    sameSite: "lax",
+    sameSite: "none",
     path: "/",
     expires: new Date(0),
   };
@@ -160,7 +160,7 @@ export const logout = async (req, res, next) => {
     .cookie("userToken", "", cookieOptions)
     .cookie("isLoggedIn", "", {
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
       expires: new Date(0),
     })
