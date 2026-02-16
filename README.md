@@ -49,11 +49,32 @@ El sistema está diseñado bajo una arquitectura modular cliente-servidor, con m
 
 ## Instalación Local
 
+- **Backend**
+
 ```
-s
+cd server
+npm install
+npm run dev
 ```
+Variables necesarias:
 ```
-s
+PORT
+MONGO_URL
+CLOUDINARY_CLOUD_NAME
+CLOUDINARY_API_SECRET
+CLOUDINARY_API_KEY
+JWT_SECRET_KEY
+STRIPE_SECRET_KEY
+JWT_EXPIRES
+COOKIE_EXPIRE
+
+```
+
+- **Frontend**
+```
+cd client
+npm install
+npm run dev
 ```
 
 
