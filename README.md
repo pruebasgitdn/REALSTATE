@@ -192,21 +192,58 @@ export const verifyUserToken = (req, res, next) => {
       
 ```
 
-## Flujo de pago Compra / Reserva con Stripe()
+## Flujo de pago Compra / Reserva con Stripe
+1. El usuario autenticado presiona 'Proceder al pago' en **PaymentButton.jsx** (Cliente), lo que desencadena en:
+   - El disparo del thunk (`const checkoutUrl = await dispatch(payThunkActivos(listing)).unwrap();`) que apunta al controlador que crea la sesión de pago de stripe en el backend **checkoutController.js** controlador **gotoPay** (Backend):
+```   
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: extractingItems,
+      mode: "payment",
+      success_url: `${clientOrigin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${clientOrigin}/cancel`,
+      metadata: {
+        pub_id,
+        antiguoprop_id,
+        nuevoprop_id,
+        totalUSD: totalUSD.toFixed(2),
+      },
+    });
+```
+Como resultado de la creación de la session se genera un `CHECKOUT_SESSION_ID` y 2 urls;  si se culminó con éxito (la transacción) se redirige a **Success.jsx**, en caso de no ser así a **Cancel.jsx** (Cliente)
+
+2. Una vez en **Success.jsx** cogemos el query de la url session_id = `CHECKOUT_SESSION_ID`, generado en la creacion de la sesion en el Backend y tras un pago éxitoso en el Cliente.
+
+ - Se extrae dicho `CHECKOUT_SESSION_ID` el cual se va a registrar (junto a su data asociada) en **Sales** o **Bookings** en el controlador **verifyPay y/o verifyBookingPay -> checkoutController.js** (Backend)
+ - Además de emitir los eventos a los involucrados en dicha operación , para su notificación
+```
+export const verifyPay = async (req, res, next) => {
+      ...
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("notifyMyListingPurchased", ppListing);
+    }
+
+    if (receiverNewProperty) {
+      io.to(receiverNewProperty).emit("listingPurchased", ppListing);
+    }
+
+       response = await Sales.create({
+        session_id: id_session,
+        publicacionId: pub_id,
+        antiguoPropID: antiguoprop_id,
+        nuevoPropId: nuevoprop_id,
+        precioVenta: Number(totalUSD),
+      });
+      ....
+```
+- Este controlador **goToPay** o **goToPayBooking** inician la creacion de la sesión de pago para cada uno de sus procesos: Compra (Sales) o una Reserva (Booking) (Backend)
+- Este controlador **verifyPay** o **verifyBookingPay** hacen el registro y la persistencia en la BD de las operaciones anteriores, ya sea una Compra (Sales) o una Reserva (Booking) (Backend)
+
+3. Una vez culminado el pago ya sea de Compra de propiedad o Reserva, se puede observar el historial de la operacion anterior en **TripList.jsx** o **MySales.jsx**
 
 ## Flujo de mensajes
 
-## Flujo de Compra con Stripe
-1. Usuario autenticado presiona “Comprar”
-2. Se ejecuta el thunk que apunta al controlador goToPay
-3. Dicho controlador crea la sesion de pago de Stripe
-4. Stripe redirige al usuario a la pasarela de pago
-- En caso de éxito se redirecciona a success
-5. En success se ejecuta una verificación:
-- Se consulta la sesión en Stripe.
-- Se registra venta en la colección Sales y la persistencia en la BD 
-- Se transfiere propiedad al nuevo propietario.
-- Se emiten eventos Socket.io para notificar a ambas partes.
+
 
 ## Lógica de Reservas
 **Validaciones implementadas:**
