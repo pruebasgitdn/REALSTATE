@@ -7,6 +7,7 @@ El sistema está diseñado bajo una arquitectura modular cliente-servidor, con m
 ### Backend: Render
 ### Base de datos: MongoDB Atlas
 ### Pagos: Stripe Checkout (modo test)
+### Websockets: Socket.io
 (Agregar enlace y video demo)
 
 ## Características principales
@@ -58,7 +59,10 @@ npm run dev
 ```
 Variables necesarias:
 ```
-PORT
+PORT=4000
+CLIENT_DEV_URI=http://localhost:5173
+CLIENT_PROD_URI=https://realtime-chat-neon-xi.vercel.app
+
 MONGO_URL
 CLOUDINARY_CLOUD_NAME
 CLOUDINARY_API_SECRET
@@ -75,6 +79,11 @@ COOKIE_EXPIRE
 cd client
 npm install
 npm run dev
+```
+Variables necesarias:
+```
+VITE_REACT_APP_BASE_DEV_URI=http://localhost:4000
+VITE_REACT_APP_BACKEND_PROD_URI=https://realtime-chat-neon-xi.vercel.app/
 ```
 
 
@@ -94,20 +103,22 @@ npm run dev
 ### Backend
 **Node.js + Express**
 - **Arquitectura modular, y sus modulos:**
-  - users
-  - listings
-  - bookings
-  - checkout
-  - message
-  - favorites
+- **Modulos:**
+  - Users
+  - Listings
+  - Bookings
+  - Checkout
+  - Message
+  - Favorites
 
-- MongoDB + Mongoose
-- JWT + cookies seguras
-- Stripe SDK
-- Cloudinary
-- Middlewares
-- Validaciones con express-validator
-- Sistema centralizado de errores
+- **Arquitectura:**
+  - MongoDB + Mongoose
+  - JWT + cookies seguras
+  - Stripe SDK
+  - Cloudinary
+  - Middlewares
+  - Validaciones con express-validator
+  - Sistema centralizado de errores
 
 ## Infraestructura
 - **Vercel (Frontend)**
@@ -115,6 +126,11 @@ npm run dev
 - **MongoDB Atlas**
 - **Stripe (modo test)**
 
+## Flujo de Autenticación
+
+## Flujo de pago Compra / Reserva con Stripe()
+
+## Flujo de mensajes
 
 ## Flujo de Compra con Stripe
 1. Usuario autenticado presiona “Comprar”
