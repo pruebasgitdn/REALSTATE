@@ -86,7 +86,6 @@ VITE_REACT_APP_BASE_DEV_URI=http://localhost:4000
 VITE_REACT_APP_BACKEND_PROD_URI=https://realtime-chat-neon-xi.vercel.app/
 ```
 
-
 ## Arquitectura
 ### Frontend
 - React 19 + Vite
@@ -127,6 +126,71 @@ VITE_REACT_APP_BACKEND_PROD_URI=https://realtime-chat-neon-xi.vercel.app/
 - **Stripe (modo test)**
 
 ## Flujo de Autenticación
+1. El usuario despacha la acción `await dispatch(initSession(formDataToSend)).unwrap()` en el **LoginPage.jsx** vía **POST** `/api/user/login` (Cliente)
+2. Se genera el método que firma el token, en el esquema del User **User.js** (Backend)
+```
+UserSchema.methods.generateJWT = function () {
+  //Firma el token con el _id
+  return jwt.sign(
+    {
+      id: this._id,
+      ...,
+    },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: process.env.JWT_EXPIRES,
+    }
+  );
+};
+```
+El cual sera invocado en la función que lo genera y lo guarda en las cookies, una vez el inicio de sesion sea éxitoso en el controlador del login.
+```
+export const generateToken = (user, message, statusCode, res) => {
+  const token = user.generateJWT(); //del modelo
+  const cookieName = "userToken";
+  const cookieOptions = {
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+  };
+
+  res
+    .status(statusCode)
+    .cookie(cookieName, token, cookieOptions)
+    ...}
+```
+3. Todas las rutas protegidas pasan por el middleware `verifyUserToken` **authMiddleware.js** (Backend), la cual funciona de la siguiente manera:
+   - Extrae las cookies (que van firmadas con el token)
+   - Verifica (el token) y las valida
+   - De ser válidas (el token) se continúa con la peticion pasando la información del token, de no serlo se bloquea toda la acción
+
+```
+export const verifyUserToken = (req, res, next) => {
+  const token = req.cookies.userToken;
+
+  if (!token) {
+    return next(
+      new AppError({
+        message: "No se proporciona el token, autorización denegada.",
+        statusCode: 403,
+        success: false,
+      })
+    );
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return next(
+      new AppError({
+        message: "Token inválido"
+        ...)})}}
+      
+```
 
 ## Flujo de pago Compra / Reserva con Stripe()
 
