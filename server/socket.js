@@ -8,8 +8,8 @@ const userSocketMap = {};
 export function initSocket(server) {
   const isDev = process.env.NODE_ENV !== "production";
   const clientOrigin = isDev
-    ? process.env.FRONTEND_URI_DEV
-    : process.env.FRONTEND_URI;
+    ? process.env.FRONTEND_URI_PROD
+    : process.env.FRONTEND_URI_DEV;
 
   io = new Server(server, {
     cors: {

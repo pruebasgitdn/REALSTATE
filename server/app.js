@@ -22,11 +22,11 @@ const clientOrigin = isDev
 console.log(clientOrigin);
 app.use(
   cors({
-    origin: clientOrigin,
+    origin: [process.env.FRONTEND_URI_DEV, process.env.FRONTEND_URI],
     methods: ["PUT", "DELETE", "POST", "GET"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 
 app.use(cookieParser()); //Manejo de cookies
@@ -37,7 +37,7 @@ app.use(express.static("public"));
 app.use(
   fileUpload({
     useTempFiles: true, //archivos temporales
-  })
+  }),
 );
 
 app.use("/api/user", userRouter);
