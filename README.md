@@ -242,8 +242,76 @@ export const verifyPay = async (req, res, next) => {
 3. Una vez culminado el pago ya sea de Compra de propiedad o Reserva, se puede observar el historial de la operacion anterior en **TripList.jsx** o **MySales.jsx**
 
 ## Flujo de mensajes
+1. La conexión inicia en el **App.jsx**, cuando el estado de Auth es verdaderro y no hay socket conectado.
+```
+useEffect(() => {
+    if (isAuth && !socketConnected) {
+      dispatch(connecSocketThunk());
+    }
+  }, [dispatch, isAuth, socketConnected]);
+```
+2. Que ejecuta la siguiente conexion pasando como query el id del usuario autenticado en ese momento (socket del cliente al backend)
+```
+socket = io(REALBASE_URL, {
+      query: {
+        user_id: user_id,
+      },
+```
+Uniendose asi al socket de usuarios en línea, cuando se hace una conexion como se acabo de hacer.
+```
+const userSocketMap = {};
+io.on("connection", (socket) => {
+    const user_id = socket.handshake.query.user_id;
+    if (user_id) userSocketMap[user_id] = socket.id;
 
+  //servidor emitiendo a los clientes connectados
+  io.emit("getOnlineUsers", Object.keys(userSocketMap));
+}
+```
+Esto retorna el socket de los usuarios en linea (socket del backend al cliente).
 
+3. Los mensajes se emiten desde el controlador una vez guardado el mensaje
+```
+await newMessage.save();
+const populatedMessage = await Message.findById(newMessage._id).populate(
+  "senderId",
+  "email nombre"
+);
+//emitir
+const receiverSocketId = getReceiverSocketId(receiverId);
+if (receiverSocketId) {
+  io.to(receiverSocketId).emit("newMessage", newMessage);
+  io.to(receiverSocketId).emit("notificacion", populatedMessage);
+}
+```
+Y se recibe en el cliente con la subscripción a la escucha del evento emitido previamente , que me actualiza el estado de los mensajes y emita la notificacion .
+```
+ socket.on("notificacion", (ppmsg) => {
+ notification.info({
+        message: "Nuevo mensaje",
+        description: `Nuevo mensaje de: ${
+          ppmsg.senderId.email || ppmsg.senderId.nombre
+        }`,
+})}
+```
+```
+export const subscribeSocketNewMessageEvent = (dispatch, selectedUser) => {
+socket.off("newMessage");
+socket.on("newMessage", (message) => {
+    ....
+    let obj = {
+      receiverId: message.receiverId,
+      senderId: message.senderId,
+      data: {
+        text: message.text,
+      },
+    };
+
+    dispatch(addMessage(obj));
+}
+}
+```
+Notificación y recepcion / emision de mensaje.
 
 ## Lógica de Reservas
 **Validaciones implementadas:**
@@ -272,8 +340,9 @@ Prevención de sobreponer reservas:
 - Persistencia en base de datos.
 - Modal del chat carga historial al abrir.
 - Notificaciones en tiempo real cuando:
-- Se agenda propiedad (al dueño de la propiedad).
-- Se compra propiedad (al antiguo propietario de la misma, que ya ha sido comprada/adquirida).
+  - Se agenda propiedad (al dueño de la propiedad).
+  - Se compra propiedad (al antiguo propietario de la misma, que ya ha sido comprada/adquirida).
+  - Se recibe un mensaje 
 
 ## Decisiones Técnicas Importantes
 - Arquitectura modular en backend para mejorar la escalabilidad y separar responsabilidades entre modulos.
