@@ -313,6 +313,47 @@ socket.on("newMessage", (message) => {
 ```
 Notificación y recepcion / emision de mensaje.
 
+### Sistema de Chat
+- Comunicación 1 a 1 en tiempo real.
+- Persistencia en base de datos.
+- Modal del chat carga historial al abrir.
+- Notificaciones en tiempo real cuando:
+  - Se agenda propiedad (al dueño de la propiedad).
+  - Se compra propiedad (al antiguo propietario de la misma, que ya ha sido comprada/adquirida).
+  - Se recibe un mensaje
+
+
+## Estados Globales
+La aplicación utiliza Redux Toolkit para manejar los estados de usuario, mensajes y grupos:
+
+- bookingSlice: Gestiona las reservas.
+- chatSlice: Maneja los mensajes (1 a 1).
+- favoSlice: Favoritos.
+- listingSlice: Encargado de todas las propiedades.
+- userSlice: Gestion del usuario.
+
+### Flujo de actualización
+Todos los slices se combinan en un único store , accesible para toda la aplicación a traves de `useSelector` y `useDispatch`.
+Los slices se actualizan mediante acciones y dispatch.
+- Ejemplo, cuando el servidor envía un nuevo mensaje vía Socket.io, el cliente despacha `addMessage` en `chatSlice` para actualizar el estado global.
+```
+export const subscribeSocketNewMessageEvent = (dispatch, selectedUser) => {
+  socket.off("newMessage");
+  socket.on("newMessage", (message) => {
+    let obj = {
+      receiverId: message.receiverId,
+      senderId: message.senderId,
+      data: {
+        text: message.text,
+      },
+    };
+
+    dispatch(addMessage(obj));
+  });
+};
+```
+
+
 ## Lógica de Reservas
 **Validaciones implementadas:**
 - Usuario no puede reservar su propia propiedad.
@@ -335,14 +376,7 @@ Prevención de sobreponer reservas:
 - Por mes (mínimo 28 días)
 - Precio fijo (VENTA)
 
-## Sistema de Chat
-- Comunicación 1 a 1 en tiempo real.
-- Persistencia en base de datos.
-- Modal del chat carga historial al abrir.
-- Notificaciones en tiempo real cuando:
-  - Se agenda propiedad (al dueño de la propiedad).
-  - Se compra propiedad (al antiguo propietario de la misma, que ya ha sido comprada/adquirida).
-  - Se recibe un mensaje 
+
 
 ## Decisiones Técnicas Importantes
 - Arquitectura modular en backend para mejorar la escalabilidad y separar responsabilidades entre modulos.
