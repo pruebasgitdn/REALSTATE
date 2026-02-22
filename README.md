@@ -7,6 +7,7 @@ El sistema está diseñado bajo una arquitectura modular cliente-servidor, con m
 ### Backend: Render
 ### Base de datos: MongoDB Atlas
 ### Pagos: Stripe Checkout (modo test)
+### Websockets: Socket.io
 (Agregar enlace y video demo)
 
 ## Características principales
@@ -58,7 +59,10 @@ npm run dev
 ```
 Variables necesarias:
 ```
-PORT
+PORT=4000
+CLIENT_DEV_URI=http://localhost:5173
+CLIENT_PROD_URI=https://realtime-chat-neon-xi.vercel.app
+
 MONGO_URL
 CLOUDINARY_CLOUD_NAME
 CLOUDINARY_API_SECRET
@@ -76,7 +80,11 @@ cd client
 npm install
 npm run dev
 ```
-
+Variables necesarias:
+```
+VITE_REACT_APP_BASE_DEV_URI=http://localhost:4000
+VITE_REACT_APP_BACKEND_PROD_URI=https://realtime-chat-neon-xi.vercel.app/
+```
 
 ## Arquitectura
 ### Frontend
@@ -94,20 +102,22 @@ npm run dev
 ### Backend
 **Node.js + Express**
 - **Arquitectura modular, y sus modulos:**
-  - users
-  - listings
-  - bookings
-  - checkout
-  - message
-  - favorites
+- **Modulos:**
+  - Users
+  - Listings
+  - Bookings
+  - Checkout
+  - Message
+  - Favorites
 
-- MongoDB + Mongoose
-- JWT + cookies seguras
-- Stripe SDK
-- Cloudinary
-- Middlewares
-- Validaciones con express-validator
-- Sistema centralizado de errores
+- **Arquitectura:**
+  - MongoDB + Mongoose
+  - JWT + cookies seguras
+  - Stripe SDK
+  - Cloudinary
+  - Middlewares
+  - Validaciones con express-validator
+  - Sistema centralizado de errores
 
 ## Infraestructura
 - **Vercel (Frontend)**
@@ -115,18 +125,234 @@ npm run dev
 - **MongoDB Atlas**
 - **Stripe (modo test)**
 
+## Flujo de Autenticación
+1. El usuario despacha la acción `await dispatch(initSession(formDataToSend)).unwrap()` en el **LoginPage.jsx** vía **POST** `/api/user/login` (Cliente)
+2. Se genera el método que firma el token, en el esquema del User **User.js** (Backend)
+```
+UserSchema.methods.generateJWT = function () {
+  //Firma el token con el _id
+  return jwt.sign(
+    {
+      id: this._id,
+      ...,
+    },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: process.env.JWT_EXPIRES,
+    }
+  );
+};
+```
+El cual sera invocado en la función que lo genera y lo guarda en las cookies, una vez el inicio de sesion sea éxitoso en el controlador del login.
+```
+export const generateToken = (user, message, statusCode, res) => {
+  const token = user.generateJWT(); //del modelo
+  const cookieName = "userToken";
+  const cookieOptions = {
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+  };
 
-## Flujo de Compra con Stripe
-1. Usuario autenticado presiona “Comprar”
-2. Se ejecuta el thunk que apunta al controlador goToPay
-3. Dicho controlador crea la sesion de pago de Stripe
-4. Stripe redirige al usuario a la pasarela de pago
-- En caso de éxito se redirecciona a success
-5. En success se ejecuta una verificación:
-- Se consulta la sesión en Stripe.
-- Se registra venta en la colección Sales y la persistencia en la BD 
-- Se transfiere propiedad al nuevo propietario.
-- Se emiten eventos Socket.io para notificar a ambas partes.
+  res
+    .status(statusCode)
+    .cookie(cookieName, token, cookieOptions)
+    ...}
+```
+3. Todas las rutas protegidas pasan por el middleware `verifyUserToken` **authMiddleware.js** (Backend), la cual funciona de la siguiente manera:
+   - Extrae las cookies (que van firmadas con el token)
+   - Verifica (el token) y las valida
+   - De ser válidas (el token) se continúa con la peticion pasando la información del token, de no serlo se bloquea toda la acción
+
+```
+export const verifyUserToken = (req, res, next) => {
+  const token = req.cookies.userToken;
+
+  if (!token) {
+    return next(
+      new AppError({
+        message: "No se proporciona el token, autorización denegada.",
+        statusCode: 403,
+        success: false,
+      })
+    );
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return next(
+      new AppError({
+        message: "Token inválido"
+        ...)})}}
+      
+```
+
+## Flujo de pago Compra / Reserva con Stripe
+1. El usuario autenticado presiona 'Proceder al pago' en **PaymentButton.jsx** (Cliente), lo que desencadena en:
+   - El disparo del thunk (`const checkoutUrl = await dispatch(payThunkActivos(listing)).unwrap();`) que apunta al controlador que crea la sesión de pago de stripe en el backend **checkoutController.js** controlador **gotoPay** (Backend):
+```   
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: extractingItems,
+      mode: "payment",
+      success_url: `${clientOrigin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${clientOrigin}/cancel`,
+      metadata: {
+        pub_id,
+        antiguoprop_id,
+        nuevoprop_id,
+        totalUSD: totalUSD.toFixed(2),
+      },
+    });
+```
+Como resultado de la creación de la session se genera un `CHECKOUT_SESSION_ID` y 2 urls;  si se culminó con éxito (la transacción) se redirige a **Success.jsx**, en caso de no ser así a **Cancel.jsx** (Cliente)
+
+2. Una vez en **Success.jsx** cogemos el query de la url session_id = `CHECKOUT_SESSION_ID`, generado en la creacion de la sesion en el Backend y tras un pago éxitoso en el Cliente.
+
+ - Se extrae dicho `CHECKOUT_SESSION_ID` el cual se va a registrar (junto a su data asociada) en **Sales** o **Bookings** en el controlador **verifyPay y/o verifyBookingPay -> checkoutController.js** (Backend)
+ - Además de emitir los eventos a los involucrados en dicha operación , para su notificación
+```
+export const verifyPay = async (req, res, next) => {
+      ...
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("notifyMyListingPurchased", ppListing);
+    }
+
+    if (receiverNewProperty) {
+      io.to(receiverNewProperty).emit("listingPurchased", ppListing);
+    }
+
+       response = await Sales.create({
+        session_id: id_session,
+        publicacionId: pub_id,
+        antiguoPropID: antiguoprop_id,
+        nuevoPropId: nuevoprop_id,
+        precioVenta: Number(totalUSD),
+      });
+      ....
+```
+- Este controlador **goToPay** o **goToPayBooking** inician la creacion de la sesión de pago para cada uno de sus procesos: Compra (Sales) o una Reserva (Booking) (Backend)
+- Este controlador **verifyPay** o **verifyBookingPay** hacen el registro y la persistencia en la BD de las operaciones anteriores, ya sea una Compra (Sales) o una Reserva (Booking) (Backend)
+
+3. Una vez culminado el pago ya sea de Compra de propiedad o Reserva, se puede observar el historial de la operacion anterior en **TripList.jsx** o **MySales.jsx**
+
+## Flujo de mensajes
+1. La conexión inicia en el **App.jsx**, cuando el estado de Auth es verdaderro y no hay socket conectado.
+```
+useEffect(() => {
+    if (isAuth && !socketConnected) {
+      dispatch(connecSocketThunk());
+    }
+  }, [dispatch, isAuth, socketConnected]);
+```
+2. Que ejecuta la siguiente conexion pasando como query el id del usuario autenticado en ese momento (socket del cliente al backend)
+```
+socket = io(REALBASE_URL, {
+      query: {
+        user_id: user_id,
+      },
+```
+Uniendose asi al socket de usuarios en línea, cuando se hace una conexion como se acabo de hacer.
+```
+const userSocketMap = {};
+io.on("connection", (socket) => {
+    const user_id = socket.handshake.query.user_id;
+    if (user_id) userSocketMap[user_id] = socket.id;
+
+  //servidor emitiendo a los clientes connectados
+  io.emit("getOnlineUsers", Object.keys(userSocketMap));
+}
+```
+Esto retorna el socket de los usuarios en linea (socket del backend al cliente).
+
+3. Los mensajes se emiten desde el controlador una vez guardado el mensaje
+```
+await newMessage.save();
+const populatedMessage = await Message.findById(newMessage._id).populate(
+  "senderId",
+  "email nombre"
+);
+//emitir
+const receiverSocketId = getReceiverSocketId(receiverId);
+if (receiverSocketId) {
+  io.to(receiverSocketId).emit("newMessage", newMessage);
+  io.to(receiverSocketId).emit("notificacion", populatedMessage);
+}
+```
+Y se recibe en el cliente con la subscripción a la escucha del evento emitido previamente , que me actualiza el estado de los mensajes y emita la notificacion .
+```
+ socket.on("notificacion", (ppmsg) => {
+ notification.info({
+        message: "Nuevo mensaje",
+        description: `Nuevo mensaje de: ${
+          ppmsg.senderId.email || ppmsg.senderId.nombre
+        }`,
+})}
+```
+```
+export const subscribeSocketNewMessageEvent = (dispatch, selectedUser) => {
+socket.off("newMessage");
+socket.on("newMessage", (message) => {
+    ....
+    let obj = {
+      receiverId: message.receiverId,
+      senderId: message.senderId,
+      data: {
+        text: message.text,
+      },
+    };
+
+    dispatch(addMessage(obj));
+}
+}
+```
+Notificación y recepcion / emision de mensaje.
+
+### Sistema de Chat
+- Comunicación 1 a 1 en tiempo real.
+- Persistencia en base de datos.
+- Modal del chat carga historial al abrir.
+- Notificaciones en tiempo real cuando:
+  - Se agenda propiedad (al dueño de la propiedad).
+  - Se compra propiedad (al antiguo propietario de la misma, que ya ha sido comprada/adquirida).
+  - Se recibe un mensaje
+
+
+## Estados Globales
+La aplicación utiliza Redux Toolkit para manejar los estados de usuario, mensajes y grupos:
+
+- bookingSlice: Gestiona las reservas.
+- chatSlice: Maneja los mensajes (1 a 1).
+- favoSlice: Favoritos.
+- listingSlice: Encargado de todas las propiedades.
+- userSlice: Gestion del usuario.
+
+### Flujo de actualización
+Todos los slices se combinan en un único store , accesible para toda la aplicación a traves de `useSelector` y `useDispatch`.
+Los slices se actualizan mediante acciones y dispatch.
+- Ejemplo, cuando el servidor envía un nuevo mensaje vía Socket.io, el cliente despacha `addMessage` en `chatSlice` para actualizar el estado global.
+```
+export const subscribeSocketNewMessageEvent = (dispatch, selectedUser) => {
+  socket.off("newMessage");
+  socket.on("newMessage", (message) => {
+    let obj = {
+      receiverId: message.receiverId,
+      senderId: message.senderId,
+      data: {
+        text: message.text,
+      },
+    };
+
+    dispatch(addMessage(obj));
+  });
+};
+```
+
 
 ## Lógica de Reservas
 **Validaciones implementadas:**
@@ -150,13 +376,7 @@ Prevención de sobreponer reservas:
 - Por mes (mínimo 28 días)
 - Precio fijo (VENTA)
 
-## Sistema de Chat
-- Comunicación 1 a 1 en tiempo real.
-- Persistencia en base de datos.
-- Modal del chat carga historial al abrir.
-- Notificaciones en tiempo real cuando:
-- Se agenda propiedad (al dueño de la propiedad).
-- Se compra propiedad (al antiguo propietario de la misma, que ya ha sido comprada/adquirida).
+
 
 ## Decisiones Técnicas Importantes
 - Arquitectura modular en backend para mejorar la escalabilidad y separar responsabilidades entre modulos.
