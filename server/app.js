@@ -18,7 +18,7 @@ config({ path: "./config.env" });
 const isDev = process.env.NODE_ENV !== "production";
 const clientOrigin = isDev
   ? process.env.FRONTEND_URI_DEV
-  : process.env.FRONTEND_URI;
+  : process.env.FRONTEND_URI_PROD;
 console.log(clientOrigin);
 app.use(
   cors({
