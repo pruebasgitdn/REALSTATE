@@ -16,6 +16,7 @@ export function initSocket(server) {
       origin: [process.env.FRONTEND_URI_PROD, process.env.FRONTEND_URI_DEV],
       credentials: true,
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      allowedHeaders: ["Content-Type", "Authorization"],
     },
     transports: ["websocket", "polling"],
     pingTimeout: 60000, // 60 s
