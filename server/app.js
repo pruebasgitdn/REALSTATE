@@ -24,7 +24,7 @@ console.log("Origin app" + clientOrigin);
 
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URI_DEV, process.env.FRONTEND_URI_PRD],
+    origin: clientOrigin,
     methods: ["PUT", "DELETE", "POST", "GET"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
