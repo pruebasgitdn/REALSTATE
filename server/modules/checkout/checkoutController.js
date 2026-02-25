@@ -13,7 +13,7 @@ const router = express.Router();
 const isDev = process.env.NODE_ENV !== "production";
 const clientOrigin = isDev
   ? process.env.FRONTEND_URI_DEV
-  : process.env.FRONTEND_URI;
+  : process.env.FRONTEND_URI_PROD;
 
 export const goToPay = async (req, res, next) => {
   try {
@@ -53,7 +53,7 @@ export const goToPay = async (req, res, next) => {
     const totalUSD = items.reduce((sum, s) => sum + s.precio / 4347.448, 0);
 
     const extractMetada = items.map((s) => {
-      (pub_id = s._id), (antiguoprop_id = s.creador._id);
+      ((pub_id = s._id), (antiguoprop_id = s.creador._id));
     });
 
     //ITEMS
@@ -97,7 +97,7 @@ export const goToPay = async (req, res, next) => {
         message: "ERROR INTERNO DEL SERVIDOR",
         statusCode: 500,
         success: false,
-      })
+      }),
     );
   }
 };
@@ -112,7 +112,7 @@ export const verifyPay = async (req, res, next) => {
           message: "No se obtuvo el session id",
           statusCode: 400,
           success: false,
-        })
+        }),
       );
     }
     console.log(id_session);
@@ -124,8 +124,8 @@ export const verifyPay = async (req, res, next) => {
         .json(
           new ResponseSucces(
             "Venta ya procesada previamente",
-            insertedSessionID
-          )
+            insertedSessionID,
+          ),
         );
     }
 
@@ -152,7 +152,7 @@ export const verifyPay = async (req, res, next) => {
         return res
           .status(200)
           .json(
-            new ResponseSucces("Venta ya procesada previamente", existingSale)
+            new ResponseSucces("Venta ya procesada previamente", existingSale),
           );
       }
       throw error;
@@ -168,7 +168,7 @@ export const verifyPay = async (req, res, next) => {
           message: "No se pudo actualizar el registro del propietario",
           statusCode: 404,
           success: false,
-        })
+        }),
       );
     }
 
@@ -196,8 +196,8 @@ export const verifyPay = async (req, res, next) => {
       .json(
         new ResponseSucces(
           "Venta registrada y propiedad actualizada correctamente",
-          response
-        )
+          response,
+        ),
       );
   } catch (error) {
     console.log(error);
@@ -206,7 +206,7 @@ export const verifyPay = async (req, res, next) => {
         message: "ERROR INTERNO DEL SERVIDOR",
         statusCode: 500,
         success: false,
-      })
+      }),
     );
   }
 };
@@ -236,7 +236,7 @@ export const gotoPayBooking = async (req, res, next) => {
           message: "El listado ya esta reserved en esas fechas",
           statusCode: 409,
           success: false,
-        })
+        }),
       );
     }
 
@@ -289,7 +289,7 @@ export const gotoPayBooking = async (req, res, next) => {
         message: "ERROR INTERNO DEL SERVIDOR",
         statusCode: 500,
         success: false,
-      })
+      }),
     );
   }
 };
@@ -304,7 +304,7 @@ export const verifyBookingPay = async (req, res, next) => {
           message: "No se obtuvo el session id",
           statusCode: 400,
           success: false,
-        })
+        }),
       );
     }
 
@@ -317,7 +317,7 @@ export const verifyBookingPay = async (req, res, next) => {
           message: "Pago no confirmado",
           statusCode: 400,
           success: false,
-        })
+        }),
       );
     }
 
@@ -350,7 +350,7 @@ export const verifyBookingPay = async (req, res, next) => {
         message: error.message || "ERROR INTERNO DEL SERVIDOR",
         statusCode: 500,
         success: false,
-      })
+      }),
     );
   }
 };
@@ -365,7 +365,7 @@ export const getUserPurchases = async (req, res, next) => {
           message: "No se proporcionó el id de usuario",
           statusCode: 400,
           success: false,
-        })
+        }),
       );
     }
 
@@ -395,7 +395,7 @@ export const getUserPurchases = async (req, res, next) => {
         message: "ERROR INTERNO DEL SERVIDOR",
         statusCode: 500,
         success: false,
-      })
+      }),
     );
   }
 };
@@ -424,7 +424,7 @@ export const getUserSales = async (req, res, next) => {
           message: "No se encontraron ventas / registros para ese id",
           statusCode: 404,
           success: false,
-        })
+        }),
       );
     }
     return res.status(200).json({
@@ -440,7 +440,7 @@ export const getUserSales = async (req, res, next) => {
         message: "ERROR INTERNO DEL SERVIDOR",
         statusCode: 500,
         success: false,
-      })
+      }),
     );
   }
 };
