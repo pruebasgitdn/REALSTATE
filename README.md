@@ -8,7 +8,11 @@ El sistema está diseñado bajo una arquitectura modular cliente-servidor, con m
 ### Base de datos: MongoDB Atlas
 ### Pagos: Stripe Checkout (modo test)
 ### Websockets: Socket.io
-(Agregar enlace y video demo)
+
+
+- ![Captura de pantalla](./frontend/public/assets/rme1.png)
+- [Ver Demo - Link YouTube](https://www.youtube.com/watch?v=Olm2mKGDiJQ)
+
 
 ## Características principales
 
