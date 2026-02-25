@@ -11,6 +11,8 @@ export function initSocket(server) {
     ? process.env.FRONTEND_URI_DEV
     : process.env.FRONTEND_URI_PROD;
 
+  console.log("Origin socket" + clientOrigin);
+
   io = new Server(server, {
     cors: {
       origin: clientOrigin,

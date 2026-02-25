@@ -19,10 +19,12 @@ const isDev = process.env.NODE_ENV !== "production";
 const clientOrigin = isDev
   ? process.env.FRONTEND_URI_DEV
   : process.env.FRONTEND_URI_PROD;
-console.log(clientOrigin);
+
+console.log("Origin app" + clientOrigin);
+
 app.use(
   cors({
-    origin: clientOrigin,
+    origin: [process.env.FRONTEND_URI_DEV, process.env.FRONTEND_URI_PRD],
     methods: ["PUT", "DELETE", "POST", "GET"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
