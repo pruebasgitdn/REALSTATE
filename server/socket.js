@@ -13,7 +13,7 @@ export function initSocket(server) {
 
   io = new Server(server, {
     cors: {
-      origin: clientOrigin,
+      origin: [process.env.FRONTEND_URI_PROD, process.env.FRONTEND_URI_DEV],
       credentials: true,
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     },
